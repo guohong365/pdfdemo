@@ -1,0 +1,13 @@
+papers:
+  weekly:
+    name: "迪 庆 州 天 气 周 报"
+    page: "A4"
+    margin:
+      top: 2.54
+      bottom: 1.97
+      left: 3.18
+      right: 2.27
+    default-font:
+      name: "simfang.ttf"
+      size: 16  ;三号字
+    important:

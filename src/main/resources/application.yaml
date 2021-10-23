@@ -1,0 +1,97 @@
+papers:
+  font-path: "src/main/resources/fonts"
+  templates-path: "result/templates"
+  fonts:
+    - name: "hei"
+      file: "simhei.ttf"
+    - name: "fang"
+      file: "simfang.ttf"
+    - name: "kai"
+      file: "simkai.ttf"
+    - name: "xbs"
+      file: "fzxbsjw.ttf"
+    - name: "li"
+      file: "stliti.ttf"
+  papers:
+    - name: "迪庆州天气周报"
+      page-setting:
+        page: "A4"
+        margin:
+          top: 2.54
+          bottom: 1.97
+          left: 3.18
+          right: 2.27
+        default-font:
+          name: "fang"
+          size: 16
+      elements:
+        - name: "标题"
+          format: "迪 庆 州 天 气 周 报"
+          color: RED
+          font:
+            name: "xbs"
+            size: 47
+          alignment: CenterCenter
+        - name: "周报期数"
+          format: "{year}年  第{stage}期"
+          font:
+            name: "kai"
+            size: 16
+          alignment: CenterCenter
+        - name: "发文信息"
+          type: TABLE
+          chilren:
+            - name: "发文单位"
+              format: "迪庆州气象局"
+              alignment: LeftCenter
+            - name: "签发人"
+              format: "签发：{issue}"
+              alignment: CenterCenter
+            - name: "签发日期"
+              format: "{dateTime}"
+              alignment: RightCenter
+        - name: "细红线"
+          type: LINE
+          width: 1
+          color: RED
+        - name: "间隔"
+          type: LINE
+          width: 1
+          color: WHITE
+        - name: "粗红线"
+          type: LINE
+          width: 3
+          color: RED
+        - name: "正文标题"
+          format: "{weekdate}"
+          font:
+            name: "xbs"
+            size: 18
+          alignment: CenterCenter
+        - name: "上周天气概况标题"
+          format: "一、上周天气概况"
+          font:
+            name: "hei"
+          indent: 2
+        - name: "上周天气概况说明"
+          format: "{caption}"
+          indent: 2
+        - name: "上周累计降水量"
+          type: IMAGE
+          format: "{chart}"
+          alignment:
+        - name: "本周天气展望标题"
+          format: "二、本周天气展望"
+          indent: 2
+          font:
+            name: "hei"
+          alignment: LeftCenter
+        - name: "本周天气展望正文"
+          indent: 2
+
+        - name: "降水量区间统计名称"
+
+
+
+
+
