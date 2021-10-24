@@ -5,7 +5,7 @@ public class Font {
     public static final float DEFAULT_SIZE = 16;
     private String name;
     private String file;
-    private float size;
+    private Float size;
 
     public Font() {
         this.size = DEFAULT_SIZE;
@@ -15,7 +15,7 @@ public class Font {
         this(name, file, DEFAULT_SIZE);
     }
 
-    public Font(String name, String file, float size) {
+    public Font(String name, String file, Float size) {
         this.name = name;
         this.size = size;
         this.file = file;
@@ -37,11 +37,11 @@ public class Font {
         this.name = name;
     }
 
-    public float getSize() {
+    public Float getSize() {
         return size;
     }
 
-    public void setSize(float size) {
+    public void setSize(Float size) {
         this.size = size;
     }
 }

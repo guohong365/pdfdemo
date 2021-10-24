@@ -40,7 +40,35 @@ public abstract class PaperGeneratorBase implements IPaperGenerator {
     public PaperSetting getSetting() {
         return setting;
     }
+    protected float getWidth() {
+        return getSetting().getPageSetting().getPage().getWidth()
+                - getSetting().getPageSetting().getMargin().getLeft()
+                - getSetting().getPageSetting().getMargin().getRight();
+    }
 
+    protected float getHeight() {
+        return getSetting().getPageSetting().getPage().getHeight()
+                - getSetting().getPageSetting().getMargin().getTop()
+                - getSetting().getPageSetting().getMargin().getBottom();
+    }
+
+    protected float getBottom() {
+        return getSetting().getPageSetting().getPage().getHeight()
+                - getSetting().getPageSetting().getMargin().getBottom();
+    }
+
+    protected float getTop() {
+        return getSetting().getPageSetting().getMargin().getTop();
+    }
+
+    protected float getLeft() {
+        return getSetting().getPageSetting().getMargin().getLeft();
+    }
+
+    protected float getRight() {
+        return getSetting().getPageSetting().getPage().getWidth()
+                - getSetting().getPageSetting().getMargin().getRight();
+    }
     protected Document createDocument(Map<String, Object> params, String outputFile) throws FileNotFoundException {
         File output = new File(outputFile);
         output.getParentFile().mkdirs();
@@ -75,7 +103,7 @@ public abstract class PaperGeneratorBase implements IPaperGenerator {
         this.config = config;
     }
 
-    public void generate(Map<String, Object> params, String output) throws FileNotFoundException {
+    public void generate(Map<String, Object> params, String output) throws FileNotFoundException, MalformedURLException {
         Document document = createDocument(params, output);
         onGenerate(document, params);
         onBeforeDocumentClosed(document, params);

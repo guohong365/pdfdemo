@@ -2,9 +2,10 @@ package com.nantian.weather.config;
 
 import com.itextpdf.kernel.colors.Color;
 
+import java.awt.geom.FlatteningPathIterator;
 import java.util.List;
 
-public class ElementSettings {
+public class ElementDescriptor {
     public static final ElementType DEFAULT_TYPE = ElementType.PARAGRAPH;
     String name;
     List<String> keys;
@@ -14,19 +15,51 @@ public class ElementSettings {
     String value;
     Font font;
     float fontSize;
-    ElementAlignment alignment;
+
+    public ElementAlignment getVertAlignment() {
+        return vertAlignment;
+    }
+
+    public void setVertAlignment(ElementAlignment vertAlignment) {
+        this.vertAlignment = vertAlignment;
+    }
+
+    public ElementAlignment getHorzAlignment() {
+        return horzAlignment;
+    }
+
+    public void setHorzAlignment(ElementAlignment horzAlignment) {
+        this.horzAlignment = horzAlignment;
+    }
+
+    public ElementAlignment getTextAlignment() {
+        return textAlignment;
+    }
+
+    public void setTextAlignment(ElementAlignment textAlignment) {
+        this.textAlignment = textAlignment;
+    }
+
+    ElementAlignment vertAlignment;
+    ElementAlignment horzAlignment;
+    ElementAlignment textAlignment;
     Color color;
-    List<ElementSettings> children;
-    ElementSettings() {
+
+    public boolean isOptional() {
+        return optional;
+    }
+
+    public void setOptional(boolean optional) {
+        this.optional = optional;
+    }
+
+    boolean optional;
+    List<ElementDescriptor> children;
+    ElementDescriptor() {
         this.type = ElementType.PARAGRAPH;
-    }
-
-    public ElementAlignment getAlignment() {
-        return alignment;
-    }
-
-    public void setAlignment(ElementAlignment alignment) {
-        this.alignment = alignment;
+        this.vertAlignment=ElementAlignment.None;
+        this.horzAlignment=ElementAlignment.None;
+        this.textAlignment=ElementAlignment.None;
     }
 
     public float getWidth() {
@@ -93,11 +126,11 @@ public class ElementSettings {
         this.fontSize = fontSize;
     }
 
-    public List<ElementSettings> getChildren() {
+    public List<ElementDescriptor> getChildren() {
         return children;
     }
 
-    public void setChildren(List<ElementSettings> children) {
+    public void setChildren(List<ElementDescriptor> children) {
         this.children = children;
     }
 

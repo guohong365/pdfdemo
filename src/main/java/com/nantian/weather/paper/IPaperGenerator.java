@@ -3,6 +3,7 @@ package com.nantian.weather.paper;
 import com.nantian.weather.config.PaperSetting;
 
 import java.io.FileNotFoundException;
+import java.net.MalformedURLException;
 import java.util.Map;
 
 public interface IPaperGenerator {
@@ -10,5 +11,5 @@ public interface IPaperGenerator {
 
     PaperSetting getSetting();
 
-    void generate(Map<String, Object> params, String output) throws FileNotFoundException;
+    void generate(Map<String, Object> params, String output) throws FileNotFoundException, MalformedURLException;
 }

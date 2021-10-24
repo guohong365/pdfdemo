@@ -5,7 +5,7 @@ import java.util.List;
 public class PaperSetting {
     private String name;
     private PageSetting pageSetting;
-    private List<ElementSettings> elements;
+    private List<ElementDescriptor> elements;
 
     public String getName() {
         return name;
@@ -23,11 +23,11 @@ public class PaperSetting {
         this.pageSetting = pageSetting;
     }
 
-    public List<ElementSettings> getElements() {
+    public List<ElementDescriptor> getElements() {
         return elements;
     }
 
-    public void setElements(List<ElementSettings> elements) {
+    public void setElements(List<ElementDescriptor> elements) {
         this.elements = elements;
     }
 }

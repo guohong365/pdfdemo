@@ -12,9 +12,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Configuration
+//@Configuration
 //@PropertySource(value = "classpath:papers.yaml", factory = YamlPropertySourceFactory.class, ignoreResourceNotFound = true)
-@ConfigurationProperties(prefix = "papers")
+//@ConfigurationProperties(prefix = "papers")
 public class PapersConfig {
     static Map<String, PdfFont> pdfFontMap = new HashMap<>();
     String fontPath;

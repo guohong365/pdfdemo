@@ -20,13 +20,14 @@ import com.itextpdf.layout.property.VerticalAlignment;
 import com.nantian.pdf.Units;
 import com.nantian.weather.paper.LineSeparatorEx;
 import com.nantian.weather.paper.WeeklyPaperGenerator;
+import com.nantian.weather.paper.factory.ElementFactory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 @SpringBootTest
 class PdfDemoApplicationTests {
@@ -50,7 +51,7 @@ class PdfDemoApplicationTests {
     static PdfFont hei;
     static PdfFont fang;
     static PdfFont xbs;
-    @Autowired
+    //@Autowired
     WeeklyPaperGenerator generator;
 
     @BeforeAll
@@ -64,6 +65,11 @@ class PdfDemoApplicationTests {
     @Test
     void genWeekly() {
 
+    }
+
+    @Test
+    void keyParser(){
+        List<String> keys= ElementFactory.parseKeys("123year{date1}}456{date}");
     }
 
     @Test
