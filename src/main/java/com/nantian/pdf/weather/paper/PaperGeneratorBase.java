@@ -12,8 +12,7 @@ import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.kernel.pdf.canvas.parser.PdfDocumentContentParser;
 import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.IBlockElement;
-import com.itextpdf.layout.element.Image;
+import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.layout.LayoutPosition;
 import com.itextpdf.layout.property.*;
 import com.nantian.pdf.parse.ElementLocationLitener;
@@ -24,11 +23,12 @@ import com.nantian.pdf.weather.config.IPageSetting;
 import com.nantian.pdf.weather.config.IPapersConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -187,18 +187,58 @@ public abstract class PaperGeneratorBase implements IPaperGenerator {
 
     protected void beforeDocumentClosed(Document document, Map<String, Object> params) {
     }
-    protected void addImage(Document document, Map<String, Object> params, String keyBarChart) throws MalformedURLException {
-        Object param;
-        param = params.get(keyBarChart);
-        if (param != null) {
-            document
-                    .add(new Image(ImageDataFactory.create(new URL(MessageFormat.format("{0}", params.get(keyBarChart)))))
+    protected void addFormTable(Document document, Object tableList, Object tableName) {
+        if (!(tableList instanceof List)) return ;
+        List<String> list = (List<String>) tableList;
+        if (list.size() == 0) return ;
+
+        String[] items = list.get(0).split("\\|");
+        float[] widths = new float[items.length];
+        Arrays.fill(widths, 1);
+        Table table = new Table(widths)
+                .setHorizontalAlignment(HorizontalAlignment.CENTER)
+                .setAutoLayout()
+                .setFontSize(FONT_SIZE_50_10_5)
+                .setTextAlignment(TextAlignment.CENTER)
+                .setKeepWithNext(true)
+                .setMarginTop(FONT_SIZE_4S_12)
+                .setMarginBottom(FONT_SIZE_4S_12)
+                .setKeepTogether(true);
+
+        for (String line : list) {
+            items = line.split("\\|");
+            for (String item : items) {
+                table.addCell(item);
+            }
+        }
+        document.add(table);
+        if (tableName != null) {
+            document.add(new Paragraph(tableName.toString())
+                    .setFontSize(FONT_SIZE_50_10_5)
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setMarginBottom(FONT_SIZE_4S_12));
+        }
+    }
+    protected void addImage(Document document, Object url) throws MalformedURLException {
+        if (url!=null && StringUtils.hasText(url.toString())) {
+            Image image=new Image(ImageDataFactory.create(new URL(url.toString())))
                             .setHorizontalAlignment(HorizontalAlignment.CENTER)
-                            .setMargins(0, 0, 0, 0)
+                            .setMargins(FONT_SIZE_40_14, 0, FONT_SIZE_40_14, 0)
                             .setPadding(0)
                             .setObjectFit(ObjectFit.CONTAIN)
-                            .scaleToFit(getWidth(),getHeight()/2));
-
+                            .scaleToFit(getWidth(),getHeight() * 0.4f);
+            document.add(image);
         }
+    }
+
+    protected Div createMultiLineTextBlock(String text, float indent, float leading){
+        if(!StringUtils.hasText(text)) return null;
+        String[] lines= text.split("\n");
+        Div div=new Div();
+        for(String line :lines){
+            Paragraph p=new Paragraph(line).setFirstLineIndent(indent).setFixedLeading(leading);
+            div.add(p);
+        }
+        return div;
     }
 }

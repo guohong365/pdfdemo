@@ -8,7 +8,7 @@ import java.util.Map;
 public interface IPapersConfig {
     String getFontPath();
     List<Font> getFonts();
-    String getTemplatesPath();
+    String getResourcesPath();
     Map<String, PageSetting> getSettings();
     FontCollection createFonts(String...names);
 }

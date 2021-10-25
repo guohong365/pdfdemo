@@ -4,19 +4,15 @@ import com.itextpdf.io.font.PdfEncodings;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.font.PdfFontFactory;
-import com.itextpdf.kernel.geom.*;
+import com.itextpdf.kernel.geom.PageSize;
+import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.PdfReader;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.kernel.pdf.canvas.draw.SolidLine;
-import com.itextpdf.kernel.pdf.canvas.parser.EventType;
 import com.itextpdf.kernel.pdf.canvas.parser.PdfDocumentContentParser;
-import com.itextpdf.kernel.pdf.canvas.parser.data.*;
-import com.itextpdf.kernel.pdf.canvas.parser.filter.IEventFilter;
-import com.itextpdf.kernel.pdf.canvas.parser.listener.FilteredEventListener;
-import com.itextpdf.kernel.pdf.canvas.parser.listener.ITextExtractionStrategy;
 import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.Border;
@@ -27,10 +23,7 @@ import com.nantian.pdf.Units;
 import com.nantian.pdf.parse.ElementLocationLitener;
 import com.nantian.pdf.parse.IElementLocationLitener;
 import com.nantian.pdf.parse.IPdfElementLocation;
-import com.nantian.pdf.weather.paper.FontCollection;
-import com.nantian.pdf.weather.paper.ISpecialWeatherService;
-import com.nantian.pdf.weather.paper.IWeeklyReport;
-import com.nantian.pdf.weather.paper.LineSeparatorEx;
+import com.nantian.pdf.weather.paper.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -52,16 +45,16 @@ class PdfDemoApplicationTests {
     static float RIGHT_MARGIN = Units.cm2pt(2.6f);
     static float HEIGHT = Units.cm2pt(22.5f);
     static float WIDTH = Units.cm2pt(15.6f);
-    static float LINE_SPACE = 14.3f;
-    static float FOOT = Units.cm2pt(3f);
     static float TITLE_SIZE = 47f;
     static float BODY_SIZE = 16f;
-    static float MAIN_TITLE_SIZE = 18f;
 
     @Autowired
     IWeeklyReport weeklyReport;
     @Autowired
     ISpecialWeatherService specialWeatherService;
+
+    @Autowired
+    IImportantForecastService importantForecastService;
 
     FontCollection createFonts() throws IOException {
         FontCollection collection = new FontCollection();
@@ -72,7 +65,7 @@ class PdfDemoApplicationTests {
         return collection;
     }
 
-    @Test
+    //@Test
     void PdfParser() {
 
         IElementLocationLitener listener = new ElementLocationLitener();
@@ -126,11 +119,11 @@ class PdfDemoApplicationTests {
         params.put(IWeeklyReport.KEY_DATE_TIME, "2021年10月22日");
         params.put(IWeeklyReport.KEY_WEEK_DATE, "2021年10月22日～28日天气周报");
         params.put(IWeeklyReport.KEY_CAPTION, "过去一周：10月15日、10月16日西南部、西北部、东南部、中部、东部、南部、西部、北部出现小雨，其它地区晴；10月17日西北部、西部出现中雨，其它地区出现小雨；10月18日西北部、东南部、东部、南部、西部出现小雨，其它地区晴；10月19日西北部、东南部、中部、东部、南部、西部出现小雨，其它地区晴；10月20日西南部、西北部、东南部、中部、东部、南部、西部出现小雨，其它地区晴；10月21日西北部、东南部出现中雨，其它地区出现小雨。上周全州50～99.9毫米的有13站（占总站数9.6%，最大降雨量为德钦县巴东68.8毫米），25～49.9毫米的有38站（占总站数27.9%），10～24.9毫米的有34站（占总站数25.0%），0.1～9.9毫米的有19站（占总站数14.0%）。上周全州最高温31.1℃，出现在香格里拉市东旺站；最低温2℃，出现在德钦县雪山丫口站。上周全州极大风速21.5米/秒（9级烈风），出现在德钦县佛山站。");
-        String[] header = {"50～99.9毫米", "25～49.9毫米", "10～24.9毫米", "0.1～9.9毫米"};
-        String[] data = {"5", "30", "44", "26"};
-        List<List<String>> tableData = new ArrayList<>();
-        tableData.add(Arrays.asList(header));
-        tableData.add(Arrays.asList(data));
+        String[] data = {
+                "50～99.9毫米|25～49.9毫米|10～24.9毫米|0.1～9.9毫米",
+                "5|30|44|26"
+        };
+        List<String> tableData = new ArrayList<>(Arrays.asList(data));
         params.put(IWeeklyReport.KEY_FORM, tableData);
         params.put(IWeeklyReport.KEY_TABLE_NAME, "表1-降水量区间统计");
         params.put(IWeeklyReport.KEY_BAR_CHART, "file:///D:/PdfDemo/map600x800.png");
@@ -160,9 +153,39 @@ class PdfDemoApplicationTests {
 
     }
 
-    @Test
-    void importantForecastTest() {
+    Map<String, Object> importantForecastPreparing() {
+        Map<String, Object> params = new HashMap<>();
+        params.put(IImportantForecastService.KEY_YEAR, "2020");
+        params.put(IImportantForecastService.KEY_STAGE, "11");
+        params.put(IImportantForecastService.KEY_ISSUE, "江  初");
+        params.put(IImportantForecastService.KEY_DATE_TIME, "2020年7月15日");
+        params.put(IImportantForecastService.KEY_PARAGRAPH_TITLE_1, "2020年7月16～20日我州将出现");
+        params.put(IImportantForecastService.KEY_PARAGRAPH_TITLE_2, "明显降雨天气过程   谨防地质灾害");
+        params.put(IImportantForecastService.KEY_PARAGRAPH_MESSAGE, "预计2020年7月16～20日我州自东向西将出现一次明显降雨天气过程：最强降雨时段7月16日午后至7月19日夜间，香格里拉市、德钦县、维西县中雨，局部大雨；其他时段小雨，局部中到大雨。累计雨量：维西县，香格里拉市中南部和德钦县南部地区30～60mm,其他地区10～30mm，最大小时雨强10～25mm。");
+        params.put(IImportantForecastService.KEY_CHART, "file:///D:/PdfDemo/map600x800.png");
+        params.put(IImportantForecastService.KEY_SPECIFIC_FORECAST, "过程预报：\n" +
+                "7月16日全州小雨；17日香格里拉市中东部、维西县澜沧江沿线中到大雨，其他地区小到中雨；7月18～19日香格里拉市中南部、维西县澜沧江沿线、德钦县南部中到大雨，其他地区中雨；7月20日全州转为小雨。\n" +
+                "具体城镇预报：\n" +
+                "7月16日：香格里拉市、维西县、德钦县小雨。\n" +
+                "7月17日：香格里拉市、维西县中雨，德钦县小雨。\n" +
+                "7月18～19日：香格里拉市、维西县、德钦县中雨。\n" +
+                "7月20日：香格里拉市、维西县、德钦县小雨。");
+        params.put(IImportantForecastService.KEY_FOLLOW, "（一）预计2020年7月16～20日我州将出现一次明显降雨天气过程。持续降雨，路面湿滑，能见度低，地质灾害气象风险升高，部分路段易出现道路塌方，请提前防范降雨天气对各行业造成的不利影响；加强地质灾害易发区、库塘堤坝、在建工程、中小学校、交通干道、景区景点、城镇防涝的安全巡察，做好山洪、泥石流和山体崩塌等灾害的防范工作。\n" +
+                "（二）夏季多雷电、大风、冰雹等强对流灾害性天气，需加强高层建筑和户外广告等的防雷、防风设施工作。\n" +
+                "（三）请及时关注迪庆州气象台发布的各类气象灾害预报预警信息。");
+        params.put(IImportantForecastService.KEY_REPORTING, "州长、主管气象副州长、州委办公室、州政府办公室，州人大、州政协、州应急局、州农业农村局、州自然资源和规划局、州交通运输局、州公安局交警支队、州消防支队、州民政局、州文化和旅游局、州自然资源公安局、州生态环境局、州住房城乡建设局、州水务局、州林草局、防汛抗旱办、护林防火办等相关单位。");
+        params.put(IImportantForecastService.KEY_REPORT, "省局应急减灾处、省局科技预报处、省台决策科，州局领导，州局各、直属单位、内设机构，各县（市）气象局。 ");
+        params.put(IImportantForecastService.KEY_FORECASTER, "李永千");
+        params.put(IImportantForecastService.KEY_MAKER, "段志方");
+        params.put(IImportantForecastService.KEY_CHECKER, "和丽云");
+        params.put(IImportantForecastService.KEY_CONTACT_NUMBER, "0887-8223034");
+        return params;
+    }
 
+    @Test
+    void importantForcastServiceTest() throws IOException {
+        Map<String, Object> params = importantForecastPreparing();
+        importantForecastService.generate(params, "5.pdf");
     }
 
     Map<String, Object> specialWeatherServicePreparing() {
@@ -183,10 +206,28 @@ class PdfDemoApplicationTests {
                 "（二）正值干季风干物燥，加之午后多大风天气，城乡及森林火险气象风险等级仍较高，城乡燃放烟花炮竹等节日活动和上坟将增加城乡火灾的发生几率，各地要切实做好森林防火和城乡防火工作。\n" +
                 "（三）早晚气温低，请注意及时添加衣服，预防感冒；高原紫外线较强，请注意防护。\n" +
                 "（四）请及时关注迪庆州气象台发布的各类气象灾害预报预警信息。                   ");
-        params.put(ISpecialWeatherService.KEY_SUBMITTED, "州长、主管气象副州长、州委办公室、州政府办公室，州人大、州政协、州应急局、州农业农村局、州自然资源和规划局、州交通运输局、州公安局交警支队、州消防支队、州民政局、州文化和旅游局、州自然资源公安局、州生态环境局、州住房城乡建设局、州水务局、州林草局、防汛抗旱办、护林防火办等相关单位。");
+        params.put(ISpecialWeatherService.KEY_SUBMITTED, "州长、主管气象副州长、州委办公室、州政府办公室，州人大、州政协、州应急局、州农业农村局、州自然资源和规划局、州交通运输局、州公安局交警支队、" +
+                "州消防支队、州民政局、州文化和旅游局、州自然资源公安局、州生态环境局、州住房城乡建设局、州水务局、州林草局、防汛抗旱办、护林防火办等相关单位。州长、主管气象副州长、州委办公室、州政府办公室，" +
+                "州人大、州政协、州应急局、州农业农村局、州自然资源和规划局、州交通运输局、州公安局交警支队、州消防支队、州民政局、州文化和旅游局、州自然资源公安局、州生态环境局、州住房城乡建设局、州水务局、州林草局、" +
+                "防汛抗旱办、护林防火办等相关单位。" +
+                "州长、主管气象副州长、州委办公室、州政府办公室，州人大、州政协、州应急局、州农业农村局、州自然资源和规划局、州交通运输局、州公安局交警支队、州消防支队、州民政局、州文化和旅游局、州自然资源公安局、州生态环境局、州住房城乡建设局、" +
+                "州水务局、州林草局、防汛抗旱办、护林防火办等相关单位。");
         params.put(ISpecialWeatherService.KEY_MAKE, "孙娅蕾");
         params.put(ISpecialWeatherService.KEY_CHECK_NAME, "王仔刚");
         params.put(ISpecialWeatherService.KEY_PHONE, "0887-8223034");
+        String[] dataForecast = {
+                "24～25日（除夕至初一）|小雪|-7～2|小雪|-6～1|小雨|0～10",
+                "26～27日（初二至初三）|多云|-11～5|多云|-9～4|多云|-2～13",
+                "28～30日（初四至初六）|阵雪|-8～3|阵雪|-7～2|阵雨|-1～12"
+        };
+        List<String> list = new ArrayList<>(Arrays.asList(dataForecast));
+        params.put(ISpecialWeatherService.KEY_CITY_FORECAST, list);
+        String[] dataForm = {
+                "50～99.9毫米|25～49.9毫米|10～24.9毫米|0.1～9.9毫米",
+                "5|30|44|26"
+        };
+        List<String> tableData = new ArrayList<>(Arrays.asList(dataForm));
+        params.put(IWeeklyReport.KEY_FORM, tableData);
         return params;
     }
 
@@ -196,7 +237,7 @@ class PdfDemoApplicationTests {
         specialWeatherService.generate(params, "4.pdf");
     }
 
-    @Test
+    //@Test
     void contextLoads() throws IOException {
         try {
             FontCollection fonts = createFonts();
@@ -342,79 +383,6 @@ class PdfDemoApplicationTests {
             ex.printStackTrace();
             throw ex;
         }
-    }
-
-    class Listener extends FilteredEventListener {
-
-        public Listener(ITextExtractionStrategy delegate) {
-            super(delegate, new IEventFilter() {
-                @Override
-                public boolean accept(IEventData iEventData, EventType eventType) {
-                    return true;
-                }
-            });
-        }
-
-        @Override
-        public void eventOccurred(IEventData iEventData, EventType eventType) {
-            if (iEventData == null) return;
-            System.out.println("EVENT: " + eventType);
-            switch (eventType) {
-                case BEGIN_TEXT:
-                case END_TEXT:
-                    break;
-                case RENDER_IMAGE: {
-                    ImageRenderInfo info = (ImageRenderInfo) iEventData;
-                }
-                break;
-                case CLIP_PATH_CHANGED: {
-                    ClippingPathInfo info = (ClippingPathInfo) iEventData;
-                    System.out.println("clip: " + info.getClippingPath());
-                    for (Subpath subpath : info.getClippingPath().getSubpaths()) {
-                        for (IShape shape : subpath.getSegments()) {
-                            System.out.println("shape: " + shape + "{" + shape.getBasePoints() + "}");
-                        }
-                    }
-                }
-                break;
-                case RENDER_TEXT: {
-                    TextRenderInfo info = (TextRenderInfo) iEventData;
-                    System.out.println("data: " + info.getText());
-                    System.out.println("leading: " + info.getLeading());
-                    System.out.println("baseline: " + info.getBaseline().getBoundingRectangle().getTop());
-                    System.out.println("AscentLine: " + info.getAscentLine().getBoundingRectangle().getTop());
-                    System.out.println("DescentLine: " + info.getDescentLine().getBoundingRectangle().getTop());
-                    System.out.println("UnscaledBaseline: " + info.getUnscaledBaseline().getBoundingRectangle().getTop());
-                    System.out.println("font size: " + info.getFontSize());
-                }
-                break;
-                case RENDER_PATH: {
-                    PathRenderInfo info = (PathRenderInfo) iEventData;
-                    System.out.println("data: " + info.getPath().getCurrentPoint());
-                    System.out.println("segments:");
-                    for (Subpath subpath : info.getPath().getSubpaths()) {
-                        for (IShape shape : subpath.getSegments()) {
-                            System.out.println("shape: " + shape + "{" + shape.getBasePoints() + "}");
-                            if (shape instanceof Line) {
-                                Line line = (Line) shape;
-                            }
-                        }
-                    }
-                }
-                break;
-            }
-        }
-/*
-        @Override
-        public Set<EventType> getSupportedEvents() {
-            Set<EventType> set=new HashSet<>();
-            set.addAll(Arrays.asList(EventType.values()));
-            set.remove(EventType.CLIP_PATH_CHANGED);
-            set.remove(EventType.BEGIN_TEXT);
-            set.remove(EventType.END_TEXT);
-            return set;
-        }
- */
     }
 
 }

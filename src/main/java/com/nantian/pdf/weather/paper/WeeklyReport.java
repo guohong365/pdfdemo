@@ -10,12 +10,9 @@ import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.UnitValue;
 import com.nantian.pdf.weather.config.IPapersConfig;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import java.net.MalformedURLException;
 import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 @Component
@@ -25,6 +22,7 @@ public class WeeklyReport extends PaperGeneratorBase implements IWeeklyReport {
     public WeeklyReport(IPapersConfig config) {
         super(config);
     }
+
 
     @Override
     protected void createBody(Document document, FontCollection fonts, Map<String, Object> params) throws MalformedURLException {
@@ -70,37 +68,9 @@ public class WeeklyReport extends PaperGeneratorBase implements IWeeklyReport {
                         .setKeepWithNext(true))
                 .add(new Paragraph(MessageFormat.format("{0}", params.get(KEY_CAPTION)))
                         .setFirstLineIndent(FONT_SIZE_30_16 * 2));
-        Object param = params.get(KEY_FORM);
-        if (param != null) {
-            List<List<String>> list = (List<List<String>>) param;
-            if (list.size() > 0 && list.get(0).size() > 0) {
-                float[] widths = new float[list.get(0).size()];
-                Arrays.fill(widths, 1);
-                Table table = new Table(widths)
-                        .setHorizontalAlignment(HorizontalAlignment.CENTER)
-                        .setAutoLayout()
-                        .setFontSize(FONT_SIZE_50_10_5)
-                        .setTextAlignment(TextAlignment.CENTER)
-                        .setKeepWithNext(true)
-                        .setMarginTop(FONT_SIZE_4S_12);
-                for (List<String> strings : list) {
-                    for (String item : strings) {
-                        table.addCell(item);
-                    }
-                }
-                document.add(table);
-                param = params.get(KEY_TABLE_NAME);
-                if (param != null && StringUtils.hasText(param.toString())) {
-                    document.add(new Paragraph(param.toString())
-                            .setFontSize(FONT_SIZE_50_10_5)
-                            .setTextAlignment(TextAlignment.CENTER)
-                            .setMarginBottom(FONT_SIZE_4S_12));
-                }
-            }
-        }
-
-        addImage(document, params, KEY_BAR_CHART);
-        addImage(document, params, KEY_CHART);
+        addFormTable(document, params.get(KEY_FORM), params.get(KEY_TABLE_NAME));
+        addImage(document, params.get(KEY_BAR_CHART));
+        addImage(document, params.get(KEY_CHART));
         document
                 .add(new Paragraph("二、本周天气展望")
                         .setFirstLineIndent(FONT_SIZE_30_16 * 2)
@@ -109,38 +79,31 @@ public class WeeklyReport extends PaperGeneratorBase implements IWeeklyReport {
                 .add(new Paragraph(MessageFormat.format("{0}", params.get(KEY_WEATHER_WEEK)))
                         .setFirstLineIndent(FONT_SIZE_30_16 * 2)
                         .setFixedLeading(28));
-        addImage(document, params, KEY_PRE_MAP);
+        addImage(document, params.get(KEY_PRE_MAP));
         document
                 .add(new Paragraph("具体城镇天气预报")
                         .setFirstLineIndent(FONT_SIZE_30_16 * 2)
                         .setFixedLeading(28)
                         .setFont(fonts.hei)
                         .setKeepWithNext(true));
-        String[] lines = params.get(KEY_WEATHER_FORECAST).toString().split("\n");
-        for (String line : lines) {
-            document
-                    .add(new Paragraph(line)
-                            .setFirstLineIndent(FONT_SIZE_30_16 * 2)
-                            .setFixedLeading(28));
-        }
+        IBlockElement block=createMultiLineTextBlock(params.get(KEY_WEATHER_FORECAST).toString(), FONT_SIZE_30_16 * 2, 28);
+        document.add(block);
         document
                 .add(new Paragraph("三、关注与建议")
                         .setFirstLineIndent(FONT_SIZE_30_16 * 2)
                         .setFont(fonts.hei)
                         .setFixedLeading(30)
                         .setKeepWithNext(true));
-        lines = params.get(KEY_FOLLOW).toString().split("\n");
-        for (String line : lines) {
-            document.add(new Paragraph(line)
-                    .setFirstLineIndent(FONT_SIZE_30_16 * 2)
-                    .setFixedLeading(28));
-        }
+        block = createMultiLineTextBlock(params.get(KEY_FOLLOW).toString(), FONT_SIZE_30_16*2, 28);
+        document.add(block);
+
     }
 
 
     @Override
     protected IBlockElement createFooter(FontCollection fonts, Map<String, Object> params) {
         Div div = new Div()
+                .setFont(fonts.fang)
                 .setFontSize(FONT_SIZE_4S_12)
                 .setKeepTogether(true);
         //上部横线
@@ -153,25 +116,26 @@ public class WeeklyReport extends PaperGeneratorBase implements IWeeklyReport {
                 .add(new Text(params.get(KEY_SUBMITTED).toString())));
         //下部横线
         div.add(new LineSeparator(new SolidLine(1)));
-        Table table=new Table(new float[]{1, 1, 1})
+        Table table = new Table(new float[]{1, 1, 1})
                 .setMarginLeft(FONT_SIZE_4S_12 * 2)
                 .setMarginRight(FONT_SIZE_4S_12 * 2)
+                .setWidth(UnitValue.createPercentValue(100))
                 .setAutoLayout()
-                .setWidth(UnitValue.createPercentValue(100));
-        Cell cell=new Cell()
+                .setHorizontalAlignment(HorizontalAlignment.CENTER);
+        Cell cell = new Cell()
                 .setBorder(Border.NO_BORDER)
-                        .setTextAlignment(TextAlignment.LEFT)
-                .add(new Paragraph("制作：" + params.get(KEY_MAKE)));
+                .add(new Paragraph("制作：" + params.get(KEY_MAKE))
+                        .setTextAlignment(TextAlignment.LEFT));
         table.addCell(cell);
-        cell=new Cell()
-                .setTextAlignment(TextAlignment.CENTER)
+        cell = new Cell()
                 .setBorder(Border.NO_BORDER)
-                .add(new Paragraph("校对：" + params.get(KEY_CHECK_NAME)));
+                .add(new Paragraph("校对：" + params.get(KEY_CHECK_NAME))
+                        .setTextAlignment(TextAlignment.CENTER));
         table.addCell(cell);
-        cell=new Cell()
-                .setTextAlignment(TextAlignment.RIGHT)
+        cell = new Cell()
                 .setBorder(Border.NO_BORDER)
-                .add(new Paragraph("联系电话：" + params.get(KEY_PHONE)));
+                .add(new Paragraph("联系电话：" + params.get(KEY_PHONE))
+                        .setTextAlignment(TextAlignment.RIGHT));
         table.addCell(cell);
         div.add(table);
         logger.info("left: {} bottom: {} width: {}", getPageSetting().getLeftMargin(), getPageSetting().getBottomMargin(), getWidth());

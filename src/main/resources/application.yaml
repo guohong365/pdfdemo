@@ -1,6 +1,6 @@
 papers:
   font-path: "src/main/resources/fonts"
-  templates-path: "result/templates"
+  resources-path: "src/main/resources/images"
   fonts:
     - name: "hei"
       file: "simhei.ttf"
@@ -22,10 +22,10 @@ papers:
         name: "fang"
         size: 16
     importantForecast:
-      top-margin: 2.54
-      bottom-margin: 1.97
-      left-margin: 3.18
-      right-margin: 2.27
+      top-margin: 72
+      bottom-margin: 55.84
+      left-margin: 90.14
+      right-margin: 64.35
       default-font:
         name: "fang"
         size: 16
@@ -37,3 +37,4 @@ papers:
       default-font:
         name: "fang"
         size: 16
+
