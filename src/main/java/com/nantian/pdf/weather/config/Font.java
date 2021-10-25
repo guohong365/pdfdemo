@@ -1,4 +1,4 @@
-package com.nantian.weather.config;
+package com.nantian.pdf.weather.config;
 
 public class Font {
     public static final String DEFAULT_NAME = "fang";
@@ -43,5 +43,14 @@ public class Font {
 
     public void setSize(Float size) {
         this.size = size;
+    }
+
+    @Override
+    public String toString() {
+        return "Font{" +
+                "name='" + name + '\'' +
+                ", file='" + file + '\'' +
+                ", size=" + size +
+                '}';
     }
 }
