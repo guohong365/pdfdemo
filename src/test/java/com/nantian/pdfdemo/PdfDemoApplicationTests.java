@@ -13,28 +13,39 @@ import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.kernel.pdf.canvas.draw.SolidLine;
 import com.itextpdf.kernel.pdf.canvas.parser.PdfDocumentContentParser;
+import com.itextpdf.kernel.pdf.xobject.PdfFormXObject;
 import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.*;
-import com.itextpdf.layout.property.HorizontalAlignment;
-import com.itextpdf.layout.property.TextAlignment;
-import com.nantian.pdf.Units;
+import com.itextpdf.layout.property.*;
+import com.itextpdf.layout.renderer.CellRenderer;
+import com.itextpdf.layout.renderer.DrawContext;
+import com.itextpdf.layout.renderer.IRenderer;
 import com.nantian.pdf.parse.ElementLocationLitener;
 import com.nantian.pdf.parse.IElementLocationLitener;
 import com.nantian.pdf.parse.IPdfElementLocation;
+import com.nantian.pdf.utils.CellSlashRenderer;
+import com.nantian.pdf.utils.Units;
+import com.nantian.pdf.utils.locators.LocationInfo;
+import com.nantian.pdf.utils.locators.ParagraphLocator;
+import com.nantian.pdf.utils.locators.TableLocator;
 import com.nantian.pdf.weather.paper.*;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.*;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.*;
 
+import static com.itextpdf.layout.property.BackgroundRepeat.BackgroundRepeatValue;
+
 @SpringBootTest
 class PdfDemoApplicationTests {
-    static final String FONT_PATH = "d:/PdfDemo/src/main/resources/fonts/";
+    static final String FONT_PATH = "src/main/resources/fonts/";
     static final String FONT_XBS = FONT_PATH + "FZXBSJW.TTF";
     static final String FONT_KAI = FONT_PATH + "simkai.ttf";
     static final String FONT_HEI = FONT_PATH + "simhei.ttf";
@@ -47,14 +58,20 @@ class PdfDemoApplicationTests {
     static float WIDTH = Units.cm2pt(15.6f);
     static float TITLE_SIZE = 47f;
     static float BODY_SIZE = 16f;
+    static final String RESULT_DIR= "target/results/";
 
     @Autowired
-    IWeeklyReport weeklyReport;
+    private IWeeklyReport weeklyReport;
     @Autowired
-    ISpecialWeatherService specialWeatherService;
+    private ISpecialWeatherService specialWeatherService;
 
     @Autowired
-    IImportantForecastService importantForecastService;
+    private IImportantForecastService importantForecastService;
+
+    @BeforeAll
+    static void beforeAll(){
+        new File(RESULT_DIR).mkdirs();
+    }
 
     FontCollection createFonts() throws IOException {
         FontCollection collection = new FontCollection();
@@ -64,6 +81,7 @@ class PdfDemoApplicationTests {
         collection.xbs = PdfFontFactory.createFont(FONT_XBS, PdfEncodings.IDENTITY_H, PdfFontFactory.EmbeddingStrategy.FORCE_EMBEDDED);
         return collection;
     }
+
 
     //@Test
     void PdfParser() {
@@ -126,9 +144,9 @@ class PdfDemoApplicationTests {
         List<String> tableData = new ArrayList<>(Arrays.asList(data));
         params.put(IWeeklyReport.KEY_FORM, tableData);
         params.put(IWeeklyReport.KEY_TABLE_NAME, "表1-降水量区间统计");
-        params.put(IWeeklyReport.KEY_BAR_CHART, "file:///D:/PdfDemo/map600x800.png");
-        params.put(IWeeklyReport.KEY_CHART, "file:///D:/PdfDemo/map600x800.png");
-        params.put(IWeeklyReport.KEY_PRE_MAP, "file:///D:/PdfDemo/map600x800.png");
+        params.put(IWeeklyReport.KEY_BAR_CHART, "file:///f:/PdfDemo/map600x800.png");
+        params.put(IWeeklyReport.KEY_CHART, "file:///f:/PdfDemo/map600x800.png");
+        params.put(IWeeklyReport.KEY_PRE_MAP, "file:///f:/PdfDemo/map600x800.png");
         params.put(IWeeklyReport.KEY_WEATHER_WEEK, "根据最新气象资料分析，预计10月22日全州有中雨；其他地区有小雨。10月23日全州有小雨。10月24日全州大面积晴转多云。10月25日全州大面积晴转多云。10月26日全州有小雨。10月27日全州有小雨。10月28日全州有小雨转晴。");
         params.put(IWeeklyReport.KEY_WEATHER_FORECAST, "10月18日：香格里拉市、维西县、德钦县阵雨。\n" +
                 "10月19～20日:香格里拉市、维西县、德钦县多云。\n" +
@@ -205,7 +223,7 @@ class PdfDemoApplicationTests {
         params.put(ISpecialWeatherService.KEY_FOLLOW, "（一）预计春节假日期间，我州有一次降雨（雪）天气过程，迪庆州境内高海拔及背阴路段有积雪和道路结冰，白马雪山路段与小中甸-虎跳峡路段易出现低能见度现象，有关部门需加强道路安全巡查，做好警示、限行等工作，确保春运出行道路交通安全。\n" +
                 "（二）正值干季风干物燥，加之午后多大风天气，城乡及森林火险气象风险等级仍较高，城乡燃放烟花炮竹等节日活动和上坟将增加城乡火灾的发生几率，各地要切实做好森林防火和城乡防火工作。\n" +
                 "（三）早晚气温低，请注意及时添加衣服，预防感冒；高原紫外线较强，请注意防护。\n" +
-                "（四）请及时关注迪庆州气象台发布的各类气象灾害预报预警信息。                   ");
+                "（四）请及时关注迪庆州气象台发布的各类气象灾害预报预警信息。");
         params.put(ISpecialWeatherService.KEY_SUBMITTED, "州长、主管气象副州长、州委办公室、州政府办公室，州人大、州政协、州应急局、州农业农村局、州自然资源和规划局、州交通运输局、州公安局交警支队、" +
                 "州消防支队、州民政局、州文化和旅游局、州自然资源公安局、州生态环境局、州住房城乡建设局、州水务局、州林草局、防汛抗旱办、护林防火办等相关单位。州长、主管气象副州长、州委办公室、州政府办公室，" +
                 "州人大、州政协、州应急局、州农业农村局、州自然资源和规划局、州交通运输局、州公安局交警支队、州消防支队、州民政局、州文化和旅游局、州自然资源公安局、州生态环境局、州住房城乡建设局、州水务局、州林草局、" +
@@ -241,7 +259,7 @@ class PdfDemoApplicationTests {
     void contextLoads() throws IOException {
         try {
             FontCollection fonts = createFonts();
-            OutputStream first_output = new FileOutputStream(new File("1-1.pdf")); // new ByteArrayOutputStream();
+            OutputStream first_output = new FileOutputStream("1-1.pdf"); // new ByteArrayOutputStream();
             PdfWriter writer = new PdfWriter(first_output);
             PdfDocument pdfDocument1 = new PdfDocument(writer);
             Document document = new Document(pdfDocument1, PageSize.A4);
@@ -327,7 +345,7 @@ class PdfDemoApplicationTests {
             document.close();
 
             //byte[] onePart = first_output.toByteArray();
-            InputStream in = new FileInputStream(new File("1-1.pdf"));
+            InputStream in = new FileInputStream("1-1.pdf");
             PdfDocument pdfDocument2 = new PdfDocument(new PdfReader(in));
             PdfDocumentContentParser parser = new PdfDocumentContentParser(pdfDocument2);
             IElementLocationLitener endPositionStrategy = new ElementLocationLitener();
@@ -337,13 +355,13 @@ class PdfDemoApplicationTests {
             System.out.println(lastLocation);
             pdfDocument2.close();
 
-            OutputStream second_output = new FileOutputStream(new File("1-2.pdf")); //new ByteArrayOutputStream();
+            OutputStream second_output = new FileOutputStream("1-2.pdf"); //new ByteArrayOutputStream();
             PdfDocument pdfDocument3 = new PdfDocument(new PdfWriter(second_output));
             Document document2 = new Document(pdfDocument3, PageSize.A4);
             document2.add(createDiv(createFonts()));
             document2.close();
             //byte[] twoPart = second_output.toByteArray();
-            in = new FileInputStream(new File("1-2.pdf"));
+            in = new FileInputStream("1-2.pdf");
             PdfDocument pdfDocument4 = new PdfDocument(new PdfReader(in));
             IElementLocationLitener secondStrategy = new ElementLocationLitener();
             parser = new PdfDocumentContentParser(pdfDocument4);
@@ -365,7 +383,7 @@ class PdfDemoApplicationTests {
             if (lastLocation.getRectangle().getBottom() < bounds.getTop()) {
                 newPage = true;
             }
-            in = new FileInputStream(new File("1-1.pdf"));
+            in = new FileInputStream("1-1.pdf");
             OutputStream out = new FileOutputStream("2.pdf");
             PdfDocument pdfDocument5 = new PdfDocument(new PdfReader(in), new PdfWriter(out));
 
@@ -382,6 +400,108 @@ class PdfDemoApplicationTests {
         } catch (Exception ex) {
             ex.printStackTrace();
             throw ex;
+        }
+    }
+
+    static class MyCellRenderer extends CellRenderer{
+
+        public MyCellRenderer(Cell modelElement) {
+            super(modelElement);
+        }
+
+        @Override
+        public void drawBackground(DrawContext drawContext) {
+            super.drawBackground(drawContext);
+            Rectangle innerArea = getInnerAreaBBox();
+            Rectangle border = getBorderAreaBBox();
+            Rectangle occupiedAreaBBox = getOccupiedAreaBBox();
+            drawContext.getCanvas()
+                    .setColor(ColorConstants.RED, false)
+                    .moveTo(innerArea.getLeft(), innerArea.getBottom())
+                    .lineTo(innerArea.getRight(), innerArea.getTop())
+                    .closePathStroke()
+                    .moveTo(border.getLeft(),border.getBottom() + border.getHeight()/2)
+                    .lineTo(border.getRight(), border.getBottom() + border.getHeight()/2)
+                    .closePathStroke()
+                    .moveTo(occupiedAreaBBox.getLeft(), occupiedAreaBBox.getTop())
+                    .lineTo(occupiedAreaBBox.getRight(), occupiedAreaBBox.getBottom())
+                    .closePathStroke();
+        }
+    }
+
+    @Test
+    void slashTest() throws IOException {
+        FontCollection fonts=createFonts();
+        String DEST = RESULT_DIR + "slash.pdf";
+
+        PdfDocument pdfDocument= new PdfDocument(new PdfWriter(new FileOutputStream(DEST)));
+
+        Document document=new Document(pdfDocument, PageSize.A4);
+
+        PdfFormXObject formXObject = new PdfFormXObject(new Rectangle(130, 30));
+        PdfCanvas pdfCanvas=new PdfCanvas(formXObject, pdfDocument);
+
+        pdfCanvas
+                .setColor(ColorConstants.RED, false)
+                .setLineWidth(1)
+                .moveTo(0,formXObject.getHeight())
+                .lineTo(formXObject.getWidth(), 0)
+                .closePathStroke();
+
+        BackgroundSize backgroundSize=new BackgroundSize();
+        backgroundSize.setBackgroundSizeToCover();
+        BackgroundImage backgroundImage= new BackgroundImage.Builder()
+                .setImage(formXObject)
+                .setBackgroundRepeat(new BackgroundRepeat(BackgroundRepeatValue.NO_REPEAT))
+                .setBackgroundSize(backgroundSize)
+                .build();
+        List<LocationInfo> rectangles=new ArrayList<>();
+        Paragraph p=new Paragraph("迪庆州气象局")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setBold()
+                .setFont(fonts.xbs)
+                .setFontSize(48);
+        p.setNextRenderer(new ParagraphLocator(p, rectangles, "first"));
+        document.add(p);
+        document.add(new Paragraph("dsafs dsaf;s dsaf;ls dsafl;sdjf sdf"));
+
+        Table table=new Table(new UnitValue[]{UnitValue.createPercentValue(20), UnitValue.createPercentValue(80)})
+                        .setFont(fonts.fang)
+                        .setAutoLayout();
+
+        String[] lines= {
+                "（一）预计春节假日期间，我州有一次降雨（雪）天气过程，迪庆州境内高海拔及背阴路段有积雪和道路结冰，白马雪山路段与小中甸-虎跳峡路段易出现低能见度现象，有关部门需加强道路安全巡查，做好警示、限行等工作，确保春运出行道路交通安全。",
+                "（二）正值干季风干物燥，加之午后多大风天气，城乡及森林火险气象风险等级仍较高，城乡燃放烟花炮竹等节日活动和上坟将增加城乡火灾的发生几率，各地要切实做好森林防火和城乡防火工作。",
+                "（三）早晚气温低，请注意及时添加衣服，预防感冒；高原紫外线较强，请注意防护。",
+                "（四）请及时关注迪庆州气象台发布的各类气象灾害预报预警信息。"
+        };
+        boolean first=true;
+
+        for(String line:lines) {
+            Cell cell = new Cell();
+            if(first){
+                cell.setPadding(0);
+                cell.setNextRenderer(new CellSlashRenderer(cell));
+                first=false;
+            }
+            p = new Paragraph(line);
+            p.setNextRenderer(new ParagraphLocator(p, rectangles, "line"));
+            table.addCell(cell)
+                    .addCell(new Cell().add(p));
+        }
+        TableLocator tableLocator=new TableLocator(table, rectangles, "table");
+        table.setNextRenderer(tableLocator);
+
+        document.add(table);
+        document.close();
+        rectangles.sort((o1, o2) -> {
+            return Float.compare(o1.getBounds().getBottom(), o2.getBounds().getBottom());
+        });
+        System.out.println(rectangles.size());
+        for(LocationInfo rectangle:rectangles){
+            System.out.println(MessageFormat.format("{4}: ({0},{1})({2},{3})",
+                    rectangle.getBounds().getLeft(), rectangle.getBounds().getBottom(),
+                    rectangle.getBounds().getRight(), rectangle.getBounds().getTop(), rectangle.getName()));
         }
     }
 

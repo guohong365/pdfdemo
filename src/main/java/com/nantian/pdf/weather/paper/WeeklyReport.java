@@ -25,8 +25,9 @@ public class WeeklyReport extends PaperGeneratorBase implements IWeeklyReport {
 
 
     @Override
-    protected void createBody(Document document, FontCollection fonts, Map<String, Object> params) throws MalformedURLException {
-        document.add(new Paragraph("迪 庆 州 天 气 周 报")
+    protected Div createBody(FontCollection fonts, Map<String, Object> params) throws MalformedURLException {
+        Div div=new Div();
+        div.add(new Paragraph("迪 庆 州 天 气 周 报")
                         .setFont(fonts.xbs)
                         .setFontSize(TITLE_SIZE)
                         .setTextAlignment(TextAlignment.CENTER)
@@ -68,10 +69,10 @@ public class WeeklyReport extends PaperGeneratorBase implements IWeeklyReport {
                         .setKeepWithNext(true))
                 .add(new Paragraph(MessageFormat.format("{0}", params.get(KEY_CAPTION)))
                         .setFirstLineIndent(FONT_SIZE_30_16 * 2));
-        addFormTable(document, params.get(KEY_FORM), params.get(KEY_TABLE_NAME));
-        addImage(document, params.get(KEY_BAR_CHART));
-        addImage(document, params.get(KEY_CHART));
-        document
+        addFormTable(div, params.get(KEY_FORM), params.get(KEY_TABLE_NAME));
+        addImage(div, params.get(KEY_BAR_CHART));
+        addImage(div, params.get(KEY_CHART));
+        div
                 .add(new Paragraph("二、本周天气展望")
                         .setFirstLineIndent(FONT_SIZE_30_16 * 2)
                         .setFont(fonts.hei).setKeepWithNext(true)
@@ -79,29 +80,29 @@ public class WeeklyReport extends PaperGeneratorBase implements IWeeklyReport {
                 .add(new Paragraph(MessageFormat.format("{0}", params.get(KEY_WEATHER_WEEK)))
                         .setFirstLineIndent(FONT_SIZE_30_16 * 2)
                         .setFixedLeading(28));
-        addImage(document, params.get(KEY_PRE_MAP));
-        document
+        addImage(div, params.get(KEY_PRE_MAP));
+        div
                 .add(new Paragraph("具体城镇天气预报")
                         .setFirstLineIndent(FONT_SIZE_30_16 * 2)
                         .setFixedLeading(28)
                         .setFont(fonts.hei)
                         .setKeepWithNext(true));
         IBlockElement block=createMultiLineTextBlock(params.get(KEY_WEATHER_FORECAST).toString(), FONT_SIZE_30_16 * 2, 28);
-        document.add(block);
-        document
+        div.add(block);
+        div
                 .add(new Paragraph("三、关注与建议")
                         .setFirstLineIndent(FONT_SIZE_30_16 * 2)
                         .setFont(fonts.hei)
                         .setFixedLeading(30)
                         .setKeepWithNext(true));
         block = createMultiLineTextBlock(params.get(KEY_FOLLOW).toString(), FONT_SIZE_30_16*2, 28);
-        document.add(block);
-
+        div.add(block);
+        return div;
     }
 
 
     @Override
-    protected IBlockElement createFooter(FontCollection fonts, Map<String, Object> params) {
+    protected Div createFooter(FontCollection fonts, Map<String, Object> params) {
         Div div = new Div()
                 .setFont(fonts.fang)
                 .setFontSize(FONT_SIZE_4S_12)

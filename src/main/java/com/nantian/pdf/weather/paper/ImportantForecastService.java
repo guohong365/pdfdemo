@@ -23,8 +23,9 @@ public class ImportantForecastService extends PaperGeneratorBase implements IImp
     }
 
     @Override
-    protected void createBody(Document document, FontCollection fonts, Map<String, Object> params) throws MalformedURLException {
-        document.add(new Paragraph("重要天气预报")
+    protected Div createBody(FontCollection fonts, Map<String, Object> params) throws MalformedURLException {
+        Div div=new Div();
+        div.add(new Paragraph("重要天气预报")
                         .setFontColor(ColorConstants.RED)
                         .setFont(fonts.xbs)
                         .setFontSize(FONT_SIZE_00_42)
@@ -55,7 +56,7 @@ public class ImportantForecastService extends PaperGeneratorBase implements IImp
                 .add(new LineSeparatorEx(new SolidLine(3), ColorConstants.RED));
         Object param = params.get(KEY_PARAGRAPH_TITLE_1);
         if (param != null && StringUtils.hasText(param.toString())) {
-            document.add(new Paragraph(param.toString())
+            div.add(new Paragraph(param.toString())
                     .setFont(fonts.xbs)
                     .setFontSize(FONT_SIZE_2S_18)
                     .setTextAlignment(TextAlignment.CENTER)
@@ -63,35 +64,36 @@ public class ImportantForecastService extends PaperGeneratorBase implements IImp
         }
         param = params.get(KEY_PARAGRAPH_TITLE_2);
         if (param != null && StringUtils.hasText(param.toString())) {
-            document.add(new Paragraph(param.toString())
+            div.add(new Paragraph(param.toString())
                     .setFont(fonts.xbs)
                     .setFontSize(FONT_SIZE_2S_18)
                     .setTextAlignment(TextAlignment.CENTER)
                     .setFixedLeading(18));
         }
-        document.add(new Paragraph(params.get(KEY_PARAGRAPH_MESSAGE).toString())
+        div.add(new Paragraph(params.get(KEY_PARAGRAPH_MESSAGE).toString())
                 .setFont(fonts.kai)
                 .setFontSize(FONT_SIZE_40_14)
                 .setFixedLeading(32)
                 .setFirstLineIndent(FONT_SIZE_40_14 * 2));
-        addImage(document, params.get(KEY_CHART));
-        document
+        addImage(div, params.get(KEY_CHART));
+        div
                 .add(new Paragraph("具体预报")
                         .setFirstLineIndent(18 * 2)
                         .setFont(fonts.hei)
                         .setFontSize(FONT_SIZE_2S_18));
-        Div div = createMultiLineTextBlock(params.get(KEY_SPECIFIC_FORECAST).toString(), FONT_SIZE_30_16 * 2, 28);
-        document.add(div);
-        document.add(new Paragraph("建  议：")
+        Div textDiv = createMultiLineTextBlock(params.get(KEY_SPECIFIC_FORECAST).toString(), FONT_SIZE_30_16 * 2, 28);
+        div.add(textDiv);
+        div.add(new Paragraph("建  议：")
                 .setFirstLineIndent(18 * 2)
                 .setFont(fonts.hei)
                 .setFontSize(FONT_SIZE_2S_18));
-        div = createMultiLineTextBlock(params.get(KEY_SPECIFIC_FORECAST).toString(), FONT_SIZE_30_16 * 2, 28);
-        document.add(div);
+        textDiv = createMultiLineTextBlock(params.get(KEY_SPECIFIC_FORECAST).toString(), FONT_SIZE_30_16 * 2, 28);
+        div.add(textDiv);
+        return div;
     }
 
     @Override
-    protected IBlockElement createFooter(FontCollection fonts, Map<String, Object> params) {
+    protected Div createFooter(FontCollection fonts, Map<String, Object> params) {
         Div div = new Div()
                 .setFont(fonts.fang)
                 .setFontSize(FONT_SIZE_4S_12)
