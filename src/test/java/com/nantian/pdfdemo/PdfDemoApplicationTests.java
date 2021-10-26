@@ -48,13 +48,15 @@ class PdfDemoApplicationTests {
     static float TITLE_SIZE = 47f;
     static float BODY_SIZE = 16f;
 
-    @Autowired
-    IWeeklyReport weeklyReport;
-    @Autowired
-    ISpecialWeatherService specialWeatherService;
 
     @Autowired
-    IImportantForecastService importantForecastService;
+    List<IPaperGenerator> generators;
+    //IWeeklyReport weeklyReport;
+    //@Autowired
+    //ISpecialWeatherService specialWeatherService;
+
+    //@Autowired
+    //IImportantForecastService importantForecastService;
 
     FontCollection createFonts() throws IOException {
         FontCollection collection = new FontCollection();
@@ -147,10 +149,21 @@ class PdfDemoApplicationTests {
     }
 
     @Test
-    void weeklyPeportTest() throws IOException {
-        Map<String, Object> params = weeklyReportPreparing();
-        weeklyReport.generate(params, "3.pdf");
-
+    void allTest() throws IOException {
+        if(generators == null){
+            System.out.println("not generator");
+            return;
+        }
+        System.out.println("found generator: " +generators.size());
+        for(IPaperGenerator generator:generators) {
+            if (generator instanceof IWeeklyReport) {
+                generator.generate(weeklyReportPreparing(), "3.pdf");
+            } else if (generator instanceof ISpecialWeatherService) {
+                generator.generate(specialWeatherServicePreparing(), "4.pdf");
+            } else if(generator instanceof IImportantForecastService){
+                generator.generate(importantForecastPreparing(), "5.pdf");
+            }
+        }
     }
 
     Map<String, Object> importantForecastPreparing() {
@@ -182,11 +195,6 @@ class PdfDemoApplicationTests {
         return params;
     }
 
-    @Test
-    void importantForcastServiceTest() throws IOException {
-        Map<String, Object> params = importantForecastPreparing();
-        importantForecastService.generate(params, "5.pdf");
-    }
 
     Map<String, Object> specialWeatherServicePreparing() {
         Map<String, Object> params = new HashMap<>();
@@ -231,11 +239,6 @@ class PdfDemoApplicationTests {
         return params;
     }
 
-    @Test
-    void specialWeatherService() throws IOException {
-        Map<String, Object> params = specialWeatherServicePreparing();
-        specialWeatherService.generate(params, "4.pdf");
-    }
 
     //@Test
     void contextLoads() throws IOException {
