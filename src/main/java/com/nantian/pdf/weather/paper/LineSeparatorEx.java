@@ -1,4 +1,4 @@
-package com.nantian.weather.paper;
+package com.nantian.pdf.weather.paper;
 
 import com.itextpdf.kernel.colors.Color;
 import com.itextpdf.kernel.pdf.canvas.draw.ILineDrawer;

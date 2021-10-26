@@ -1,6 +1,6 @@
-package com.nantian.weather.paper;
+package com.nantian.pdf.weather.paper;
 
-public interface IWeeklyPaper extends IPaperGenerator {
+public interface IWeeklyReport extends IPaperGenerator {
     String KEY_YEAR="year";
     String KEY_STAGE = "stage";
     String KEY_ISSUE="issue";
@@ -20,7 +20,7 @@ public interface IWeeklyPaper extends IPaperGenerator {
     String KEY_CHECK_NAME="checkName";
     String KEY_PHONE="phone";
 
-    String NAME = "天气周报";
+    String NAME = "weeklyReport";
 
     @Override
     default String getName() {
