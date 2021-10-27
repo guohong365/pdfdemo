@@ -23,5 +23,5 @@ public interface IPaperGenerator {
     float FONT_SIZE_70_5_5=5.5f;//七号=5.5磅=1.94毫米
     float FONT_SIZE_80_5=5;//八号=5磅=1.76毫米
     String getName();
-    void generate(Map<String, Object> params, String output) throws IOException;
+    void generate(Map<String, Object> params, String output) throws Exception;
 }

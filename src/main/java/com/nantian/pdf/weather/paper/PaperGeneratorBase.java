@@ -9,15 +9,12 @@ import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.PdfReader;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
-import com.itextpdf.kernel.pdf.canvas.parser.PdfDocumentContentParser;
 import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.layout.LayoutPosition;
 import com.itextpdf.layout.property.*;
-import com.nantian.pdf.parse.ElementLocationLitener;
-import com.nantian.pdf.parse.IElementLocationLitener;
-import com.nantian.pdf.parse.IPdfElementLocation;
+import com.nantian.pdf.utils.ChineseSplitterCharacters;
 import com.nantian.pdf.utils.locators.DivLocator;
 import com.nantian.pdf.utils.locators.LocationInfo;
 import com.nantian.pdf.weather.config.Font;
@@ -38,6 +35,7 @@ import java.util.Map;
 public abstract class PaperGeneratorBase implements IPaperGenerator {
     protected final IPapersConfig config;
     private final IPageSetting pageSetting;
+    private final List<LocationInfo> locations=new ArrayList<>();
     protected Logger logger= LoggerFactory.getLogger(getClass());
 
     protected PaperGeneratorBase(IPapersConfig config) {
@@ -48,6 +46,10 @@ public abstract class PaperGeneratorBase implements IPaperGenerator {
 
     public IPageSetting getPageSetting() {
         return pageSetting;
+    }
+
+    public List<LocationInfo> getLocations() {
+        return locations;
     }
 
     protected float getWidth() {
@@ -98,11 +100,13 @@ public abstract class PaperGeneratorBase implements IPaperGenerator {
         Font font = getPageSetting().getDefaultFont();
         document.setFontSize(font.getSize());
         document.setFont(fonts.get(font.getName()));
+        document.setSplitCharacters(new ChineseSplitterCharacters());
         onDocumentCreated(document, params);
         return document;
     }
 
-    public void generate(Map<String, Object> params, String output) throws IOException {
+    public void generate(Map<String, Object> params, String output) throws Exception {
+        locations.clear();
         FontCollection fonts = config.createFonts();
         //输出文档主要部分到内存文件
         OutputStream bodyOutput = hasFinalFooter() ? new ByteArrayOutputStream() : new FileOutputStream(output);
@@ -110,34 +114,40 @@ public abstract class PaperGeneratorBase implements IPaperGenerator {
         List<LocationInfo> bodyLocations = new ArrayList<>();
         Div div=createBody(fonts, params);
         DivLocator divLocator=new DivLocator(div, bodyLocations, "body");
+        //记录位置信息
         div.setNextRenderer(divLocator);
         document.add(div);
         document.close();
+
         if (hasFinalFooter()) {  //如果有末尾置底部分
             List<LocationInfo> footerLocation=new ArrayList<>();
             fonts = config.createFonts();
+            //输出抄送部分到内存
             ByteArrayOutputStream footerOutput = new ByteArrayOutputStream();
             document = createDocument(fonts, params, null, footerOutput);
             Div footer = createFooter(fonts, params);
             divLocator = new DivLocator(footer, footerLocation, "footer");
+            //记录页脚部分大小信息
             footer.setNextRenderer(divLocator);
             document.add(footer);
             document.close();
             assert bodyOutput instanceof ByteArrayOutputStream;
             byte[] bodyBytes = ((ByteArrayOutputStream) bodyOutput).toByteArray();
+            //byte[] footerBytes=footerOutput.toByteArray();
             InputStream bodyInput = new ByteArrayInputStream(bodyBytes);
+            if(bodyLocations.size()==0) throw new Exception("no content in pdf");
 
             logger.info(bodyLocations.toString());
-            logger.info(footerLocation.toString());
-            //两者都有内容，才进行
-            if (bodyLocations.size() > 0 && footerLocation.size()>0) {
+
+            if(footerLocation.size() > 0){ // with footer
+                //InputStream footerInput=new ByteArrayInputStream(footerBytes);
                 fonts = config.createFonts();
                 OutputStream finalOutput = new FileOutputStream(output);
-                bodyInput = new ByteArrayInputStream(bodyBytes);
                 document = createDocument(fonts, params, bodyInput, finalOutput);
-                float bodyBottom = bodyLocations.get(0).getBounds().getBottom();
+                float bodyBottom = bodyLocations.get(bodyLocations.size()-1).getBounds().getBottom();
                 float footerTop = footerLocation.get(footerLocation.size()-1).getBounds().getTop();
                 float footerBottom = footerLocation.get(0).getBounds().getBottom();
+
                 logger.info("body:{}, footer top: {}, footer bottom: {}", bodyBottom, footerTop, footerBottom);
 
                 if (footerTop - footerBottom + getPageSetting().getBottomMargin() > bodyBottom) {
@@ -157,6 +167,9 @@ public abstract class PaperGeneratorBase implements IPaperGenerator {
                 canvas.close();
                 beforeDocumentClosed(document, params);
                 document.close();
+            } else{
+                PdfDocument pdfDocument=new PdfDocument(new PdfReader(bodyInput), new PdfWriter(new FileOutputStream(output)));
+                pdfDocument.close();
             }
 
         }

@@ -13,7 +13,6 @@ import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.kernel.pdf.canvas.draw.SolidLine;
 import com.itextpdf.kernel.pdf.canvas.parser.PdfDocumentContentParser;
-import com.itextpdf.kernel.pdf.xobject.PdfFormXObject;
 import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.Border;
@@ -21,8 +20,7 @@ import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.property.*;
 import com.itextpdf.layout.renderer.CellRenderer;
 import com.itextpdf.layout.renderer.DrawContext;
-import com.itextpdf.layout.renderer.IRenderer;
-import com.nantian.pdf.parse.ElementLocationLitener;
+import com.nantian.pdf.parse.ElementLocationListener;
 import com.nantian.pdf.parse.IElementLocationLitener;
 import com.nantian.pdf.parse.IPdfElementLocation;
 import com.nantian.pdf.utils.CellSlashRenderer;
@@ -41,8 +39,6 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.*;
 
-import static com.itextpdf.layout.property.BackgroundRepeat.BackgroundRepeatValue;
-
 @SpringBootTest
 class PdfDemoApplicationTests {
     static final String FONT_PATH = "src/main/resources/fonts/";
@@ -50,6 +46,7 @@ class PdfDemoApplicationTests {
     static final String FONT_KAI = FONT_PATH + "simkai.ttf";
     static final String FONT_HEI = FONT_PATH + "simhei.ttf";
     static final String FONT_FANG = FONT_PATH + "simfang.ttf";
+    static final String IMAGE_URL = "file:///f:/PdfDemo/map600x800.png";
     static float TOP_MARGIN = Units.cm2pt(3.7f);
     static float BOTTOM_MARGIN = Units.cm2pt(3.5f);
     static float LEFT_MARGIN = Units.cm2pt(2.8f);
@@ -70,7 +67,7 @@ class PdfDemoApplicationTests {
 
     @BeforeAll
     static void beforeAll(){
-        new File(RESULT_DIR).mkdirs();
+        boolean mkdirs = new File(RESULT_DIR).mkdirs();
     }
 
     FontCollection createFonts() throws IOException {
@@ -86,7 +83,7 @@ class PdfDemoApplicationTests {
     //@Test
     void PdfParser() {
 
-        IElementLocationLitener listener = new ElementLocationLitener();
+        IElementLocationLitener listener = new ElementLocationListener();
         try {
             PdfReader reader = new PdfReader(new File("1.pdf"));
             PdfDocument pdfDocument = new PdfDocument(reader);
@@ -144,9 +141,9 @@ class PdfDemoApplicationTests {
         List<String> tableData = new ArrayList<>(Arrays.asList(data));
         params.put(IWeeklyReport.KEY_FORM, tableData);
         params.put(IWeeklyReport.KEY_TABLE_NAME, "表1-降水量区间统计");
-        params.put(IWeeklyReport.KEY_BAR_CHART, "file:///f:/PdfDemo/map600x800.png");
-        params.put(IWeeklyReport.KEY_CHART, "file:///f:/PdfDemo/map600x800.png");
-        params.put(IWeeklyReport.KEY_PRE_MAP, "file:///f:/PdfDemo/map600x800.png");
+        params.put(IWeeklyReport.KEY_BAR_CHART, IMAGE_URL);
+        params.put(IWeeklyReport.KEY_CHART, IMAGE_URL);
+        params.put(IWeeklyReport.KEY_PRE_MAP,IMAGE_URL);
         params.put(IWeeklyReport.KEY_WEATHER_WEEK, "根据最新气象资料分析，预计10月22日全州有中雨；其他地区有小雨。10月23日全州有小雨。10月24日全州大面积晴转多云。10月25日全州大面积晴转多云。10月26日全州有小雨。10月27日全州有小雨。10月28日全州有小雨转晴。");
         params.put(IWeeklyReport.KEY_WEATHER_FORECAST, "10月18日：香格里拉市、维西县、德钦县阵雨。\n" +
                 "10月19～20日:香格里拉市、维西县、德钦县多云。\n" +
@@ -165,7 +162,7 @@ class PdfDemoApplicationTests {
     }
 
     @Test
-    void weeklyPeportTest() throws IOException {
+    void weeklyReportTest() throws Exception {
         Map<String, Object> params = weeklyReportPreparing();
         weeklyReport.generate(params, "3.pdf");
 
@@ -180,7 +177,7 @@ class PdfDemoApplicationTests {
         params.put(IImportantForecastService.KEY_PARAGRAPH_TITLE_1, "2020年7月16～20日我州将出现");
         params.put(IImportantForecastService.KEY_PARAGRAPH_TITLE_2, "明显降雨天气过程   谨防地质灾害");
         params.put(IImportantForecastService.KEY_PARAGRAPH_MESSAGE, "预计2020年7月16～20日我州自东向西将出现一次明显降雨天气过程：最强降雨时段7月16日午后至7月19日夜间，香格里拉市、德钦县、维西县中雨，局部大雨；其他时段小雨，局部中到大雨。累计雨量：维西县，香格里拉市中南部和德钦县南部地区30～60mm,其他地区10～30mm，最大小时雨强10～25mm。");
-        params.put(IImportantForecastService.KEY_CHART, "file:///D:/PdfDemo/map600x800.png");
+        params.put(IImportantForecastService.KEY_CHART, IMAGE_URL);
         params.put(IImportantForecastService.KEY_SPECIFIC_FORECAST, "过程预报：\n" +
                 "7月16日全州小雨；17日香格里拉市中东部、维西县澜沧江沿线中到大雨，其他地区小到中雨；7月18～19日香格里拉市中南部、维西县澜沧江沿线、德钦县南部中到大雨，其他地区中雨；7月20日全州转为小雨。\n" +
                 "具体城镇预报：\n" +
@@ -201,7 +198,7 @@ class PdfDemoApplicationTests {
     }
 
     @Test
-    void importantForcastServiceTest() throws IOException {
+    void importantForecastServiceTest() throws Exception {
         Map<String, Object> params = importantForecastPreparing();
         importantForecastService.generate(params, "5.pdf");
     }
@@ -216,9 +213,9 @@ class PdfDemoApplicationTests {
         params.put(ISpecialWeatherService.KEY_REMARK, "预计春节期间，受高原槽影响，24～25日海拔2500米以上地区阴有小到中雪，其他地区阴有小雨；26～27日全州多云；28～30日全州出现阵雨或阵雪天气。受雨雪天气影响，相关部门需防范降雨（雪）造成的道路积雪、道路结冰现象对交通出行的不利影响。");
         params.put(ISpecialWeatherService.KEY_CAPTION, "受高原槽影响，2020年1月19日开始，我州出现大范围雨雪天气过程，德钦县、香格里拉市大部出现小到中雪，白马雪山出现暴雪，澜沧江沿线出现中雨。全州大部地区的最低气温在0℃以下，州境内高海拔及背阴路段出现积雪和道路结冰。");
         params.put(ISpecialWeatherService.KEY_FORM, "form");
-        params.put(ISpecialWeatherService.KEY_CHART, "file:///D:/PdfDemo/map600x800.png");
+        params.put(ISpecialWeatherService.KEY_CHART, IMAGE_URL);
         params.put(ISpecialWeatherService.KEY_WEATHER_FORECAST, "预计春节期间24～25日海拔2500米以上地区阴有小到中雪，其他地区阴有小雨；26～27日全州多云；28～30日全州出现阵雨或阵雪天气。");
-        params.put(ISpecialWeatherService.KEY_PRE_MAP, "file:///D:/PdfDemo/map600x800.png");
+        params.put(ISpecialWeatherService.KEY_PRE_MAP, IMAGE_URL);
         params.put(ISpecialWeatherService.KEY_CITY_FORECAST, "cityForcast");
         params.put(ISpecialWeatherService.KEY_FOLLOW, "（一）预计春节假日期间，我州有一次降雨（雪）天气过程，迪庆州境内高海拔及背阴路段有积雪和道路结冰，白马雪山路段与小中甸-虎跳峡路段易出现低能见度现象，有关部门需加强道路安全巡查，做好警示、限行等工作，确保春运出行道路交通安全。\n" +
                 "（二）正值干季风干物燥，加之午后多大风天气，城乡及森林火险气象风险等级仍较高，城乡燃放烟花炮竹等节日活动和上坟将增加城乡火灾的发生几率，各地要切实做好森林防火和城乡防火工作。\n" +
@@ -250,7 +247,7 @@ class PdfDemoApplicationTests {
     }
 
     @Test
-    void specialWeatherService() throws IOException {
+    void specialWeatherService() throws Exception {
         Map<String, Object> params = specialWeatherServicePreparing();
         specialWeatherService.generate(params, "4.pdf");
     }
@@ -348,7 +345,7 @@ class PdfDemoApplicationTests {
             InputStream in = new FileInputStream("1-1.pdf");
             PdfDocument pdfDocument2 = new PdfDocument(new PdfReader(in));
             PdfDocumentContentParser parser = new PdfDocumentContentParser(pdfDocument2);
-            IElementLocationLitener endPositionStrategy = new ElementLocationLitener();
+            IElementLocationLitener endPositionStrategy = new ElementLocationListener();
             parser.processContent(pdfDocument2.getNumberOfPages(), endPositionStrategy);
             List<IPdfElementLocation> lastLocations = endPositionStrategy.getLocations();
             IPdfElementLocation lastLocation = lastLocations.get(0);
@@ -363,7 +360,7 @@ class PdfDemoApplicationTests {
             //byte[] twoPart = second_output.toByteArray();
             in = new FileInputStream("1-2.pdf");
             PdfDocument pdfDocument4 = new PdfDocument(new PdfReader(in));
-            IElementLocationLitener secondStrategy = new ElementLocationLitener();
+            IElementLocationLitener secondStrategy = new ElementLocationListener();
             parser = new PdfDocumentContentParser(pdfDocument4);
             parser.processContent(pdfDocument4.getNumberOfPages(), secondStrategy);
             pdfDocument4.close();
@@ -438,23 +435,6 @@ class PdfDemoApplicationTests {
 
         Document document=new Document(pdfDocument, PageSize.A4);
 
-        PdfFormXObject formXObject = new PdfFormXObject(new Rectangle(130, 30));
-        PdfCanvas pdfCanvas=new PdfCanvas(formXObject, pdfDocument);
-
-        pdfCanvas
-                .setColor(ColorConstants.RED, false)
-                .setLineWidth(1)
-                .moveTo(0,formXObject.getHeight())
-                .lineTo(formXObject.getWidth(), 0)
-                .closePathStroke();
-
-        BackgroundSize backgroundSize=new BackgroundSize();
-        backgroundSize.setBackgroundSizeToCover();
-        BackgroundImage backgroundImage= new BackgroundImage.Builder()
-                .setImage(formXObject)
-                .setBackgroundRepeat(new BackgroundRepeat(BackgroundRepeatValue.NO_REPEAT))
-                .setBackgroundSize(backgroundSize)
-                .build();
         List<LocationInfo> rectangles=new ArrayList<>();
         Paragraph p=new Paragraph("迪庆州气象局")
                 .setTextAlignment(TextAlignment.CENTER)
@@ -494,9 +474,7 @@ class PdfDemoApplicationTests {
 
         document.add(table);
         document.close();
-        rectangles.sort((o1, o2) -> {
-            return Float.compare(o1.getBounds().getBottom(), o2.getBounds().getBottom());
-        });
+        rectangles.sort((o1, o2) -> Float.compare(o1.getBounds().getBottom(), o2.getBounds().getBottom()));
         System.out.println(rectangles.size());
         for(LocationInfo rectangle:rectangles){
             System.out.println(MessageFormat.format("{4}: ({0},{1})({2},{3})",

@@ -2,10 +2,13 @@ package com.nantian.pdf.weather.paper;
 
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.colors.ColorConstants;
+import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.pdf.canvas.draw.SolidLine;
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.property.*;
+import com.itextpdf.layout.renderer.IRenderer;
+import com.nantian.pdf.utils.CellSlashRenderer;
 import com.nantian.pdf.weather.config.IPapersConfig;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +24,7 @@ public class SpecialWeatherService extends PaperGeneratorBase implements ISpecia
     }
 
     @Override
-    protected Div createBody(FontCollection fonts, Map<String, Object> params) throws MalformedURLException {
+    protected Div createBody(FontCollection fonts, Map<String, Object> params) {
         Div div=new Div();
         IBlockElement block = new Paragraph(params.get(KEY_SPECIAL).toString())
                 .setFont(fonts.li)
@@ -105,7 +108,7 @@ public class SpecialWeatherService extends PaperGeneratorBase implements ISpecia
                 .setKeepWithNext(true);
         div.add(block);
 
-        addCityForecastTable(div, params.get(KEY_CITY_FORECAST));
+        addCityForecastTable(div, fonts.fang, params.get(KEY_CITY_FORECAST));
 
         block = new Paragraph("三、影响分析和建议")
                 .setFont(fonts.hei)
@@ -118,7 +121,7 @@ public class SpecialWeatherService extends PaperGeneratorBase implements ISpecia
         return div;
     }
 
-    private void addCityForecastTable(Div div, Object tableList) {
+    private void addCityForecastTable(Div div, PdfFont font, Object tableList) {
         if(!(tableList instanceof List)) return;
         List<String> list = (List<String>)tableList;
         Table table=new Table(new float[]{3,1,1,1,1,1,1})
@@ -129,24 +132,7 @@ public class SpecialWeatherService extends PaperGeneratorBase implements ISpecia
                 .setMarginBottom(FONT_SIZE_40_14)
                 .setMarginTop(FONT_SIZE_40_14);
         Cell cell=new Cell(2,1);
-        try {
-            Image image =new Image(ImageDataFactory.create(config.getResourcesPath() + File.separator + "slash.png"));
-            BackgroundImage backgroundImage=
-                    new BackgroundImage.Builder()
-                            .setImage(image.getXObject())
-                            .setBackgroundRepeat(new BackgroundRepeat(BackgroundRepeat.BackgroundRepeatValue.ROUND)).build();
-            cell.setBackgroundImage(backgroundImage)
-                    .add(new Paragraph("城市")
-                            .setTextAlignment(TextAlignment.RIGHT)
-                            .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                            .setMargins(0, 2, 0, 0))
-                    .add(new Paragraph("日期")
-                            .setTextAlignment(TextAlignment.CENTER)
-                            .setVerticalAlignment(VerticalAlignment.BOTTOM)
-                            .setMargins(0, 0,2,0));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
+        cell.setNextRenderer(new CellSlashRenderer(cell, font,  "日期", "城市"));
         table.addCell(cell);
         cell = new Cell(1,2).add(new Paragraph("香格里拉"));
         table.addCell(cell);

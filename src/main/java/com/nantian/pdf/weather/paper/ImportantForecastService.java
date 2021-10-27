@@ -23,7 +23,7 @@ public class ImportantForecastService extends PaperGeneratorBase implements IImp
     }
 
     @Override
-    protected Div createBody(FontCollection fonts, Map<String, Object> params) throws MalformedURLException {
+    protected Div createBody(FontCollection fonts, Map<String, Object> params) {
         Div div=new Div();
         div.add(new Paragraph("重要天气预报")
                         .setFontColor(ColorConstants.RED)
@@ -119,7 +119,7 @@ public class ImportantForecastService extends PaperGeneratorBase implements IImp
                 .setMarginBottom(0.8f));
         div.add(new LineSeparatorEx(new SolidLine(1), ColorConstants.RED)
                 .setMarginTop(0));
-        Table table = new Table(new float[]{1, 1, 1})
+        Table table = new Table(new float[]{1, 1, 1, 1})
                 .setFont(fonts.fang)
                 .setFontSize(FONT_SIZE_50_10_5)
                 .setMarginLeft(FONT_SIZE_50_10_5 * 2)

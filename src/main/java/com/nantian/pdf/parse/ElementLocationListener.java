@@ -13,7 +13,7 @@ import com.itextpdf.kernel.pdf.canvas.parser.listener.CharacterRenderInfo;
 
 import java.util.*;
 
-public class ElementLocationLitener implements IElementLocationLitener {
+public class ElementLocationListener implements IElementLocationLitener {
     private final List<IPdfElementLocation> result=new ArrayList<>();
 
     public List<IPdfElementLocation> getLocations() {
