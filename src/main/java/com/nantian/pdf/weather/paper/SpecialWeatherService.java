@@ -3,7 +3,10 @@ package com.nantian.pdf.weather.paper;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.pdf.canvas.draw.SolidLine;
+<<<<<<< HEAD
 import com.itextpdf.layout.Document;
+=======
+>>>>>>> origin/main
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.property.*;
@@ -22,19 +25,20 @@ public class SpecialWeatherService extends PaperGeneratorBase implements ISpecia
     }
 
     @Override
-    protected void createBody(Document document, FontCollection fonts, Map<String, Object> params) throws MalformedURLException {
+    protected Div createBody(FontCollection fonts, Map<String, Object> params) throws MalformedURLException {
+        Div div=new Div();
         IBlockElement block = new Paragraph(params.get(KEY_SPECIAL).toString())
                 .setFont(fonts.li)
                 .setFontSize(FONT_SIZE_0S_36)
                 .setTextAlignment(TextAlignment.CENTER)
                 .setFontColor(ColorConstants.RED)
                 .setMultipliedLeading(1.5f);
-        document.add(block);
+        div.add(block);
         block = new Paragraph("第" + params.get(KEY_STAGE) + "期")
                 .setFont(fonts.kai)
                 .setTextAlignment(TextAlignment.CENTER)
                 .setMultipliedLeading(1.5f);
-        document.add(block);
+        div.add(block);
         Table table = new Table(new float[]{1, 1, 1})
                 .setFont(fonts.kai)
                 .setMarginLeft(12)
@@ -55,69 +59,70 @@ public class SpecialWeatherService extends PaperGeneratorBase implements ISpecia
                 .setTextAlignment(TextAlignment.RIGHT)
                 .add(new Paragraph(params.get(KEY_DATE_TIME).toString()));
         table.addCell(cell);
-        document.add(table);
+        div.add(table);
         LineSeparator line = new LineSeparatorEx(new SolidLine(1), ColorConstants.RED)
                 .setMarginBottom(0.8f);
-        document.add(line);
+        div.add(line);
         line = new LineSeparatorEx(new SolidLine(3), ColorConstants.RED)
                 .setMarginTop(0);
-        document.add(line);
+        div.add(line);
 
         block = new Paragraph(params.get(KEY_TITLE).toString())
                 .setTextAlignment(TextAlignment.CENTER)
                 .setFont(fonts.xbs)
                 .setBold()
                 .setFontSize(FONT_SIZE_20_22);
-        document.add(block);
+        div.add(block);
         block = new Paragraph("摘要：" + params.get(KEY_REMARK))
                 .setFirstLineIndent(FONT_SIZE_30_16 * 2)
                 .setBold()
                 .setKeepTogether(true);
-        document.add(block);
+        div.add(block);
         block = new Paragraph("一、前期天气概况")
                 .setFirstLineIndent(FONT_SIZE_3S_15 * 2)
                 .setFont(fonts.hei)
                 .setFontSize(FONT_SIZE_3S_15)
                 .setFixedLeading(25)
                 .setKeepWithNext(true);
-        document.add(block);
+        div.add(block);
         block = new Paragraph(params.get(KEY_CAPTION).toString())
                 .setFirstLineIndent(FONT_SIZE_30_16 * 2)
                 .setFixedLeading(25)
                 .setKeepWithNext(true);
-        document.add(block);
-        addFormTable(document, params.get(KEY_FORM), "");
-        addImage(document, params.get(KEY_CHART));
+        div.add(block);
+        addFormTable(div, params.get(KEY_FORM), "");
+        addImage(div, params.get(KEY_CHART));
         block = new Paragraph("二、全州天气预报")
                 .setFirstLineIndent(FONT_SIZE_30_16 * 2)
                 .setFont(fonts.hei)
                 .setFixedLeading(26)
                 .setKeepWithNext(true);
-        document.add(block);
+        div.add(block);
         block = new Paragraph(params.get(KEY_WEATHER_FORECAST).toString())
                 .setFirstLineIndent(FONT_SIZE_30_16*2)
                 .setFixedLeading(26);
-        document.add(block);
-        addImage(document, params.get(KEY_PRE_MAP));
+        div.add(block);
+        addImage(div, params.get(KEY_PRE_MAP));
         block = new Paragraph("具体预报如下:")
                 .setFirstLineIndent(FONT_SIZE_30_16 * 2)
                 .setFixedLeading(26)
                 .setKeepWithNext(true);
-        document.add(block);
+        div.add(block);
 
-        addCityForcastTable(document, params.get(KEY_CITY_FORECAST));
+        addCityForecastTable(div, params.get(KEY_CITY_FORECAST));
 
         block = new Paragraph("三、影响分析和建议")
                 .setFont(fonts.hei)
                 .setFixedLeading(26)
                 .setFirstLineIndent(FONT_SIZE_30_16 * 2)
                 .setKeepWithNext(true);
-        document.add(block);
-        Div div =createMultiLineTextBlock(params.get(KEY_FOLLOW).toString(), FONT_SIZE_30_16 *2, 28);
-        document.add(div);
+        div.add(block);
+        Div textDiv =createMultiLineTextBlock(params.get(KEY_FOLLOW).toString(), FONT_SIZE_30_16 *2, 28);
+        div.add(textDiv);
+        return div;
     }
 
-    private void addCityForcastTable(Document document, Object tableList) {
+    private void addCityForecastTable(Div div, Object tableList) {
         if(!(tableList instanceof List)) return;
         List<String> list = (List<String>)tableList;
         Table table=new Table(new float[]{3,1,1,1,1,1,1})
@@ -166,11 +171,11 @@ public class SpecialWeatherService extends PaperGeneratorBase implements ISpecia
                 table.addCell(cell);
             }
         }
-        document.add(table);
+        div.add(table);
     }
 
     @Override
-    protected IBlockElement createFooter(FontCollection fonts, Map<String, Object> params) {
+    protected Div createFooter(FontCollection fonts, Map<String, Object> params) {
         Div div = new Div()
                 .setFont(fonts.fang)
                 .setFontSize(FONT_SIZE_4S_12)
