@@ -89,7 +89,7 @@ class PdfDemoApplicationTests {
 
         IElementLocationLitener listener = new ElementLocationLitener();
         try {
-            PdfReader reader = new PdfReader(new File("1.pdf"));
+            PdfReader reader = new PdfReader(new File(RESULT_DIR +"1.pdf"));
             PdfDocument pdfDocument = new PdfDocument(reader);
             PdfDocumentContentParser parser = new PdfDocumentContentParser(pdfDocument);
             parser.processContent(pdfDocument.getNumberOfPages(), listener);
@@ -168,7 +168,7 @@ class PdfDemoApplicationTests {
     @Test
     void weeklyPeportTest() throws IOException {
         Map<String, Object> params = weeklyReportPreparing();
-        weeklyReport.generate(params, "3.pdf");
+        weeklyReport.generate(params, RESULT_DIR + "3.pdf");
 
     }
 
@@ -204,7 +204,7 @@ class PdfDemoApplicationTests {
     @Test
     void importantForcastServiceTest() throws IOException {
         Map<String, Object> params = importantForecastPreparing();
-        importantForecastService.generate(params, "5.pdf");
+        importantForecastService.generate(params, RESULT_DIR +"5.pdf");
     }
 
     Map<String, Object> specialWeatherServicePreparing() {
@@ -253,14 +253,14 @@ class PdfDemoApplicationTests {
     @Test
     void specialWeatherService() throws IOException {
         Map<String, Object> params = specialWeatherServicePreparing();
-        specialWeatherService.generate(params, "4.pdf");
+        specialWeatherService.generate(params, RESULT_DIR + "4.pdf");
     }
 
     //@Test
     void contextLoads() throws IOException {
         try {
             FontCollection fonts = createFonts();
-            OutputStream first_output = new FileOutputStream("1-1.pdf"); // new ByteArrayOutputStream();
+            OutputStream first_output = new FileOutputStream(RESULT_DIR+"1-1.pdf"); // new ByteArrayOutputStream();
             PdfWriter writer = new PdfWriter(first_output);
             PdfDocument pdfDocument1 = new PdfDocument(writer);
             Document document = new Document(pdfDocument1, PageSize.A4);
@@ -346,7 +346,7 @@ class PdfDemoApplicationTests {
             document.close();
 
             //byte[] onePart = first_output.toByteArray();
-            InputStream in = new FileInputStream("1-1.pdf");
+            InputStream in = new FileInputStream(RESULT_DIR + "1-1.pdf");
             PdfDocument pdfDocument2 = new PdfDocument(new PdfReader(in));
             PdfDocumentContentParser parser = new PdfDocumentContentParser(pdfDocument2);
             IElementLocationLitener endPositionStrategy = new ElementLocationLitener();
@@ -356,7 +356,7 @@ class PdfDemoApplicationTests {
             System.out.println(lastLocation);
             pdfDocument2.close();
 
-            OutputStream second_output = new FileOutputStream("1-2.pdf"); //new ByteArrayOutputStream();
+            OutputStream second_output = new FileOutputStream(RESULT_DIR + "1-2.pdf"); //new ByteArrayOutputStream();
             PdfDocument pdfDocument3 = new PdfDocument(new PdfWriter(second_output));
             Document document2 = new Document(pdfDocument3, PageSize.A4);
             document2.add(createDiv(createFonts()));
@@ -384,8 +384,8 @@ class PdfDemoApplicationTests {
             if (lastLocation.getRectangle().getBottom() < bounds.getTop()) {
                 newPage = true;
             }
-            in = new FileInputStream("1-1.pdf");
-            OutputStream out = new FileOutputStream("2.pdf");
+            in = new FileInputStream(RESULT_DIR +"1-1.pdf");
+            OutputStream out = new FileOutputStream(RESULT_DIR+"2.pdf");
             PdfDocument pdfDocument5 = new PdfDocument(new PdfReader(in), new PdfWriter(out));
 
             if (newPage) {
