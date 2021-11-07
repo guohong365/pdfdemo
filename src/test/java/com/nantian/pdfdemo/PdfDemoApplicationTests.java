@@ -16,16 +16,17 @@ import com.itextpdf.kernel.pdf.canvas.parser.PdfDocumentContentParser;
 import com.itextpdf.kernel.pdf.xobject.PdfFormXObject;
 import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.Style;
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.property.*;
 import com.itextpdf.layout.renderer.CellRenderer;
 import com.itextpdf.layout.renderer.DrawContext;
-import com.itextpdf.layout.renderer.IRenderer;
 import com.nantian.pdf.parse.ElementLocationLitener;
 import com.nantian.pdf.parse.IElementLocationLitener;
 import com.nantian.pdf.parse.IPdfElementLocation;
 import com.nantian.pdf.utils.CellSlashRenderer;
+import com.nantian.pdf.utils.ChineseSymbolFactory;
 import com.nantian.pdf.utils.Units;
 import com.nantian.pdf.utils.locators.LocationInfo;
 import com.nantian.pdf.utils.locators.ParagraphLocator;
@@ -144,9 +145,9 @@ class PdfDemoApplicationTests {
         List<String> tableData = new ArrayList<>(Arrays.asList(data));
         params.put(IWeeklyReport.KEY_FORM, tableData);
         params.put(IWeeklyReport.KEY_TABLE_NAME, "表1-降水量区间统计");
-        params.put(IWeeklyReport.KEY_BAR_CHART, "file:///f:/PdfDemo/map600x800.png");
-        params.put(IWeeklyReport.KEY_CHART, "file:///f:/PdfDemo/map600x800.png");
-        params.put(IWeeklyReport.KEY_PRE_MAP, "file:///f:/PdfDemo/map600x800.png");
+        params.put(IWeeklyReport.KEY_BAR_CHART, "file:///d:/PdfDemo/map600x800.png");
+        params.put(IWeeklyReport.KEY_CHART, "file:///d:/PdfDemo/map600x800.png");
+        params.put(IWeeklyReport.KEY_PRE_MAP, "file:///d:/PdfDemo/map600x800.png");
         params.put(IWeeklyReport.KEY_WEATHER_WEEK, "根据最新气象资料分析，预计10月22日全州有中雨；其他地区有小雨。10月23日全州有小雨。10月24日全州大面积晴转多云。10月25日全州大面积晴转多云。10月26日全州有小雨。10月27日全州有小雨。10月28日全州有小雨转晴。");
         params.put(IWeeklyReport.KEY_WEATHER_FORECAST, "10月18日：香格里拉市、维西县、德钦县阵雨。\n" +
                 "10月19～20日:香格里拉市、维西县、德钦县多云。\n" +
@@ -503,6 +504,35 @@ class PdfDemoApplicationTests {
                     rectangle.getBounds().getLeft(), rectangle.getBounds().getBottom(),
                     rectangle.getBounds().getRight(), rectangle.getBounds().getTop(), rectangle.getName()));
         }
+    }
+
+    @Test
+    void listTest() throws IOException {
+        FontCollection fonts = createFonts();
+        String DEST= RESULT_DIR + "list_test.pdf";
+        PdfDocument pdfDocument=new PdfDocument(new PdfWriter(DEST));
+        Style style = new Style().setFont(fonts.hei).setBold();
+        IListSymbolFactory symbolFactory=new ChineseSymbolFactory(style,"、");
+        IListSymbolFactory subFactory=new ChineseSymbolFactory(new Style().setBold().setFont(fonts.kai).setFontColor(ColorConstants.BLUE), "(", ")");
+        Document document=new Document(pdfDocument);
+        document.setFont(fonts.fang);
+        com.itextpdf.layout.element.List list=new com.itextpdf.layout.element.List();
+        list.setProperty(Property.LIST_SYMBOL, symbolFactory);
+        for(int i=0; i<50; i++){
+            ListItem item=new ListItem("item:" + i);
+            item.add(new Paragraph("iText中文列表段落"));
+            com.itextpdf.layout.element.List subList=new com.itextpdf.layout.element.List();
+            subList.setProperty(Property.LIST_SYMBOL, subFactory);
+            for(int j=0; j<5; j++){
+                ListItem subItem = (ListItem) new ListItem("中文列表：" +(i+1) +"." +(j+1)).setFont(fonts.kai).setFontColor(ColorConstants.BLUE);
+                subItem.add(new Paragraph("iText中文列表段落").setFont(fonts.hei).setFontColor(ColorConstants.GREEN));
+                subList.add(subItem);
+            };
+            item.add(subList);
+            list.add(item);
+        }
+        document.add(list);
+        document.close();
     }
 
 }

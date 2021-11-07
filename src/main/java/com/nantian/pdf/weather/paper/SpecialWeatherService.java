@@ -3,10 +3,6 @@ package com.nantian.pdf.weather.paper;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.pdf.canvas.draw.SolidLine;
-<<<<<<< HEAD
-import com.itextpdf.layout.Document;
-=======
->>>>>>> origin/main
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.property.*;
@@ -25,7 +21,7 @@ public class SpecialWeatherService extends PaperGeneratorBase implements ISpecia
     }
 
     @Override
-    protected Div createBody(FontCollection fonts, Map<String, Object> params) throws MalformedURLException {
+    protected Div createBody(FontCollection fonts, Map<String, Object> params) {
         Div div=new Div();
         IBlockElement block = new Paragraph(params.get(KEY_SPECIAL).toString())
                 .setFont(fonts.li)
