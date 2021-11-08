@@ -1,13 +1,24 @@
 papers:
-  weekly:
-    name: "迪 庆 州 天 气 周 报"
-    page: "A4"
-    margin:
-      top: 2.54
-      bottom: 1.97
-      left: 3.18
-      right: 2.27
-    default-font:
-      name: "simfang.ttf"
-      size: 16  ;三号字
-    important:
+  font-path: "src/main/resources/fonts"
+  fonts:
+    - name: "hei"
+      file: "simhei.ttf"
+    - name: "fang"
+      file: "simfang.ttf"
+    - name: "kai"
+      file: "simkai.ttf"
+    - name: "xbs"
+      file: "fzxbsjw.ttf"
+    - name: "li"
+      file: "stliti.ttf"
+  settings:
+    weekly:
+      name: "迪 庆 州 天 气 周 报"
+      page: "A4"
+      top-margin: 54.43
+      bottom-margin: 54.84
+      left-margin: 70.9
+      right-margin: 70.9
+      default-font:
+        name: "fang"
+        size: 16  ;三号字

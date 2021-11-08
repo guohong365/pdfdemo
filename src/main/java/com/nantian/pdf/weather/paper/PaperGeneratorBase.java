@@ -1,7 +1,7 @@
 package com.nantian.pdf.weather.paper;
 
 import com.itextpdf.io.image.ImageDataFactory;
-import com.itextpdf.io.source.ByteArrayOutputStream;
+import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfDocument;
@@ -9,22 +9,29 @@ import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.PdfReader;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
-import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.*;
-import com.itextpdf.layout.layout.LayoutPosition;
-import com.itextpdf.layout.property.*;
+import com.itextpdf.layout.layout.LayoutArea;
+import com.itextpdf.layout.layout.LayoutContext;
+import com.itextpdf.layout.layout.LayoutResult;
+import com.itextpdf.layout.property.HorizontalAlignment;
+import com.itextpdf.layout.property.ObjectFit;
+import com.itextpdf.layout.property.TextAlignment;
+import com.itextpdf.layout.property.UnitValue;
+import com.itextpdf.layout.renderer.IRenderer;
 import com.nantian.pdf.utils.ChineseSplitterCharacters;
-import com.nantian.pdf.utils.locators.DivLocator;
 import com.nantian.pdf.utils.locators.LocationInfo;
-import com.nantian.pdf.weather.config.Font;
 import com.nantian.pdf.weather.config.IPageSetting;
 import com.nantian.pdf.weather.config.IPapersConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import java.io.*;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -34,22 +41,18 @@ import java.util.Map;
 
 public abstract class PaperGeneratorBase implements IPaperGenerator {
     protected final IPapersConfig config;
-    private final IPageSetting pageSetting;
-    private final List<LocationInfo> locations=new ArrayList<>();
+    protected final IPageSetting pageSetting;
     protected Logger logger= LoggerFactory.getLogger(getClass());
-
+    protected final FontCollection fonts;
     protected PaperGeneratorBase(IPapersConfig config) {
         this.config = config;
         String name = getName();
         this.pageSetting = config.getSettings().get(name);
+        fonts = this.config.createFonts();
     }
 
     public IPageSetting getPageSetting() {
         return pageSetting;
-    }
-
-    public List<LocationInfo> getLocations() {
-        return locations;
     }
 
     protected float getWidth() {
@@ -82,7 +85,7 @@ public abstract class PaperGeneratorBase implements IPaperGenerator {
                 - getPageSetting().getRightMargin();
     }
 
-    protected Document createDocument(FontCollection fonts, Map<String, Object> params, InputStream input, OutputStream output) throws IOException {
+    protected Document createDocument(Map<String, Object> params, InputStream input, OutputStream output) throws IOException {
         PdfDocument pdfDocument;
         if (input != null) {
             pdfDocument = new PdfDocument(new PdfReader(input), new PdfWriter(output));
@@ -97,98 +100,98 @@ public abstract class PaperGeneratorBase implements IPaperGenerator {
                 getPageSetting().getRightMargin(),
                 getPageSetting().getBottomMargin(),
                 getPageSetting().getLeftMargin());
-        Font font = getPageSetting().getDefaultFont();
-        document.setFontSize(font.getSize());
-        document.setFont(fonts.get(font.getName()));
+        document.setFontSize(pageSetting.getDefaultFont().getSize());
+        document.setFont(fonts.get(pageSetting.getDefaultFont().getName()));
         document.setSplitCharacters(new ChineseSplitterCharacters());
         onDocumentCreated(document, params);
         return document;
     }
 
     public void generate(Map<String, Object> params, String output) throws Exception {
-        locations.clear();
-        FontCollection fonts = config.createFonts();
         //输出文档主要部分到内存文件
-        OutputStream bodyOutput = hasFinalFooter() ? new ByteArrayOutputStream() : new FileOutputStream(output);
-        Document document = createDocument(fonts, params, null, bodyOutput);
+        OutputStream bodyOutput = new FileOutputStream(output);
+        Document document = createDocument(params, null, bodyOutput);
         List<LocationInfo> bodyLocations = new ArrayList<>();
-        Div div=createBody(fonts, params);
-        DivLocator divLocator=new DivLocator(div, bodyLocations, "body");
-        //记录位置信息
-        div.setNextRenderer(divLocator);
+        Div div = createBody(params);
         document.add(div);
-        document.close();
+        Rectangle effectiveArea = document.getPageEffectiveArea(PageSize.A4);
 
-        if (hasFinalFooter()) {  //如果有末尾置底部分
-            List<LocationInfo> footerLocation=new ArrayList<>();
-            fonts = config.createFonts();
-            //输出抄送部分到内存
-            ByteArrayOutputStream footerOutput = new ByteArrayOutputStream();
-            document = createDocument(fonts, params, null, footerOutput);
-            Div footer = createFooter(fonts, params);
-            divLocator = new DivLocator(footer, footerLocation, "footer");
-            //记录页脚部分大小信息
-            footer.setNextRenderer(divLocator);
-            document.add(footer);
-            document.close();
-            assert bodyOutput instanceof ByteArrayOutputStream;
-            byte[] bodyBytes = ((ByteArrayOutputStream) bodyOutput).toByteArray();
-            //byte[] footerBytes=footerOutput.toByteArray();
-            InputStream bodyInput = new ByteArrayInputStream(bodyBytes);
-            if(bodyLocations.size()==0) throw new Exception("no content in pdf");
-
-            logger.info(bodyLocations.toString());
-
-            if(footerLocation.size() > 0){ // with footer
-                //InputStream footerInput=new ByteArrayInputStream(footerBytes);
-                fonts = config.createFonts();
-                OutputStream finalOutput = new FileOutputStream(output);
-                document = createDocument(fonts, params, bodyInput, finalOutput);
-                float bodyBottom = bodyLocations.get(bodyLocations.size()-1).getBounds().getBottom();
-                float footerTop = footerLocation.get(footerLocation.size()-1).getBounds().getTop();
-                float footerBottom = footerLocation.get(0).getBounds().getBottom();
-
-                logger.info("body:{}, footer top: {}, footer bottom: {}", bodyBottom, footerTop, footerBottom);
-
-                if (footerTop - footerBottom + getPageSetting().getBottomMargin() > bodyBottom) {
-                    document.getPdfDocument().addNewPage();
-                }
-                PdfPage lastPage = document.getPdfDocument().getLastPage();
-                footer = createFooter(fonts, params);
-                PdfCanvas pdfCanvas = new PdfCanvas(lastPage);
-                Rectangle bounds = new Rectangle(getPageSetting().getLeftMargin(), getPageSetting().getBottomMargin(), getWidth(), footerTop - footerBottom);
-                Canvas canvas = new Canvas(pdfCanvas, bounds);
-                //和 footer.setFixedPosition等效
-                footer.setProperty(Property.POSITION, LayoutPosition.FIXED);
-                footer.setProperty(Property.LEFT, getPageSetting().getLeftMargin());
-                footer.setProperty(Property.BOTTOM, getPageSetting().getBottomMargin());
-                footer.setProperty(Property.WIDTH, UnitValue.createPointValue(getWidth()));
-                canvas.add(footer);
-                canvas.close();
-                beforeDocumentClosed(document, params);
-                document.close();
-            } else{
-                PdfDocument pdfDocument=new PdfDocument(new PdfReader(bodyInput), new PdfWriter(new FileOutputStream(output)));
-                pdfDocument.close();
-            }
-
+        IRenderer renderer = div.createRendererSubTree().setParent(document.getRenderer());
+        int pageNumber = 1;
+        LayoutResult layoutResult = renderer.layout(new LayoutContext(new LayoutArea(pageNumber, effectiveArea)));
+        if (layoutResult.getStatus() == LayoutResult.PARTIAL) {
+            do {
+                pageNumber++;
+                renderer = layoutResult.getOverflowRenderer();
+                layoutResult = renderer.layout(new LayoutContext(new LayoutArea(pageNumber, effectiveArea)));
+            } while (layoutResult.getStatus() == LayoutResult.PARTIAL);
         }
+        Rectangle currentSize = layoutResult.getOccupiedArea().getBBox();
+        Div footer = createFooter(params);
+        if (footer != null) {
+            Rectangle footerArea = effectiveArea.clone().setHeight(effectiveArea.getHeight() - currentSize.getHeight());
+            renderer = footer.createRendererSubTree().setParent(document.getRenderer());
+            layoutResult = renderer.layout(new LayoutContext(new LayoutArea(pageNumber, footerArea)));
+            if (layoutResult.getStatus() != LayoutResult.FULL) { //无剩余空间可以放置
+                document.add(new AreaBreak());
+                renderer = footer.createRendererSubTree().setParent(document.getRenderer());
+                layoutResult = renderer.layout(new LayoutContext(new LayoutArea(pageNumber, effectiveArea)));
+                if(layoutResult.getStatus()!=LayoutResult.FULL) {
+                    do {
+                        pageNumber++;
+                        renderer = layoutResult.getOverflowRenderer();
+                        layoutResult = renderer.layout(new LayoutContext(new LayoutArea(pageNumber, effectiveArea)));
+                    } while (layoutResult.getStatus() != LayoutResult.FULL);
+                }
+                currentSize = layoutResult.getOccupiedArea().getBBox();
+                float blankHeight =effectiveArea.getHeight() - currentSize.getHeight()- FONT_SIZE_50_10_5;
+                Table blank = new Table(1)
+                        .setWidth(UnitValue.createPercentValue(100))
+                        .setHeight(blankHeight)
+                        .setMargins(0,0,0,0)
+                        .setPadding(0);
+                blank.addCell(new Cell().setBorder(Border.NO_BORDER).add(new Paragraph(" ")));
+                document.add(blank);
+            } else {
+                footer.setFixedPosition(effectiveArea.getLeft(), effectiveArea.getBottom(), effectiveArea.getWidth());
+            }
+            document.add(footer);
+        }
+        document.close();
     }
-
+    void drawLine(PdfDocument pdfDocument, int pageNum, float x, float y, float width){
+        PdfPage pdfPage= pdfDocument.getPage(pageNum);
+        PdfCanvas pdfCanvas = new PdfCanvas(pdfPage);
+        pdfCanvas
+                .saveState()
+                .setStrokeColor(ColorConstants.MAGENTA)
+                .setLineWidth(2)
+                .moveTo(x, y)
+                .lineTo(x + width, y)
+                .stroke()
+                .restoreState();
+    }
+    void drawBox(PdfDocument pdfDocument, int pageNum, Rectangle rect){
+        PdfPage pdfPage= pdfDocument.getPage(pageNum);
+        PdfCanvas pdfCanvas = new PdfCanvas(pdfPage);
+        pdfCanvas
+                .saveState()
+                .setStrokeColor(ColorConstants.MAGENTA)
+                .setLineWidth(1)
+                .rectangle(rect)
+                .stroke()
+                .restoreState();
+    }
     protected void onPdfDocumentCreated(PdfDocument pdfDocument, Map<String, Object> params) {
     }
 
     protected void onDocumentCreated(Document document, Map<String, Object> params) {
     }
 
-    protected abstract Div createBody(FontCollection fonts, Map<String, Object> params) throws MalformedURLException;
+    protected abstract Div createBody(Map<String, Object> params) throws MalformedURLException;
 
-    protected Div createFooter(FontCollection fonts, Map<String, Object> params) {
+    protected Div createFooter(Map<String, Object> params) {
         return null;
-    }
-
-    protected boolean hasFinalFooter() {
-        return true;
     }
 
     protected void beforeDocumentClosed(Document document, Map<String, Object> params) {

@@ -1,7 +1,5 @@
 package com.nantian.pdf.utils.locators;
 
-import com.itextpdf.kernel.geom.Rectangle;
-import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.renderer.DrawContext;
 import com.itextpdf.layout.renderer.IRenderer;

@@ -2,7 +2,6 @@ package com.nantian.pdf.weather.paper;
 
 import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.pdf.canvas.draw.SolidLine;
-import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.property.HorizontalAlignment;
@@ -11,7 +10,6 @@ import com.itextpdf.layout.property.UnitValue;
 import com.nantian.pdf.weather.config.IPapersConfig;
 import org.springframework.stereotype.Component;
 
-import java.net.MalformedURLException;
 import java.text.MessageFormat;
 import java.util.Map;
 
@@ -25,7 +23,7 @@ public class WeeklyReport extends PaperGeneratorBase implements IWeeklyReport {
 
 
     @Override
-    protected Div createBody(FontCollection fonts, Map<String, Object> params) throws MalformedURLException {
+    protected Div createBody(Map<String, Object> params) {
         Div div=new Div();
         div.add(new Paragraph("迪 庆 州 天 气 周 报")
                         .setFont(fonts.xbs)
@@ -102,7 +100,7 @@ public class WeeklyReport extends PaperGeneratorBase implements IWeeklyReport {
 
 
     @Override
-    protected Div createFooter(FontCollection fonts, Map<String, Object> params) {
+    protected Div createFooter(Map<String, Object> params) {
         Div div = new Div()
                 .setFont(fonts.fang)
                 .setFontSize(FONT_SIZE_4S_12)
@@ -139,8 +137,6 @@ public class WeeklyReport extends PaperGeneratorBase implements IWeeklyReport {
                         .setTextAlignment(TextAlignment.RIGHT));
         table.addCell(cell);
         div.add(table);
-        logger.info("left: {} bottom: {} width: {}", getPageSetting().getLeftMargin(), getPageSetting().getBottomMargin(), getWidth());
-        div.setFixedPosition(getPageSetting().getLeftMargin(), getPageSetting().getBottomMargin(), getWidth());
         return div;
     }
 }

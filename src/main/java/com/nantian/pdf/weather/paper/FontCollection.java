@@ -5,12 +5,13 @@ import com.itextpdf.kernel.font.PdfFont;
 import java.util.*;
 
 public class FontCollection {
-    static final String[] NAMES = {"kai", "hei", "fang", "xbs", "li"};
+    static final String[] NAMES = {"kai", "hei", "fang", "xbs", "li", "song"};
     public PdfFont kai;
     public PdfFont hei;
     public PdfFont fang;
     public PdfFont xbs;
     public PdfFont li;
+    public PdfFont song;
     public static Collection<String> allName(){
         return Arrays.asList(NAMES);
     }
@@ -26,6 +27,8 @@ public class FontCollection {
                 return xbs;
             case "li":
                 return li;
+            case "song":
+                return song;
             default:
                 return null;
         }
@@ -46,6 +49,9 @@ public class FontCollection {
                 break;
             case "li":
                 li=pdfFont;
+                break;
+            case "song":
+                song=pdfFont;
                 break;
         }
     }

@@ -1,19 +1,17 @@
 package com.nantian.pdf.weather.paper;
 
-import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.pdf.canvas.draw.SolidLine;
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.*;
-import com.itextpdf.layout.property.*;
-import com.itextpdf.layout.renderer.IRenderer;
+import com.itextpdf.layout.property.HorizontalAlignment;
+import com.itextpdf.layout.property.TextAlignment;
+import com.itextpdf.layout.property.UnitValue;
 import com.nantian.pdf.utils.CellSlashRenderer;
 import com.nantian.pdf.weather.config.IPapersConfig;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +22,7 @@ public class SpecialWeatherService extends PaperGeneratorBase implements ISpecia
     }
 
     @Override
-    protected Div createBody(FontCollection fonts, Map<String, Object> params) {
+    protected Div createBody(Map<String, Object> params) {
         Div div=new Div();
         IBlockElement block = new Paragraph(params.get(KEY_SPECIAL).toString())
                 .setFont(fonts.li)
@@ -157,11 +155,10 @@ public class SpecialWeatherService extends PaperGeneratorBase implements ISpecia
     }
 
     @Override
-    protected Div createFooter(FontCollection fonts, Map<String, Object> params) {
+    protected Div createFooter(Map<String, Object> params) {
         Div div = new Div()
                 .setFont(fonts.fang)
-                .setFontSize(FONT_SIZE_4S_12)
-                .setKeepTogether(true);
+                .setFontSize(FONT_SIZE_4S_12);
         //上部横线
         LineSeparator line = new LineSeparatorEx(new SolidLine(1), ColorConstants.RED);
         div.add(line);
@@ -178,6 +175,7 @@ public class SpecialWeatherService extends PaperGeneratorBase implements ISpecia
         Table table = new Table(new float[]{1, 1, 1})
                 .setMarginLeft(FONT_SIZE_4S_12 * 2)
                 .setMarginRight(FONT_SIZE_4S_12 * 2)
+                .setMarginBottom(0)
                 .setAutoLayout()
                 .setWidth(UnitValue.createPercentValue(100));
         Cell cell = new Cell()
@@ -197,8 +195,6 @@ public class SpecialWeatherService extends PaperGeneratorBase implements ISpecia
                 .setBorder(Border.NO_BORDER);
         table.addCell(cell);
         div.add(table);
-
-        div.setFixedPosition(getLeft(), getBottom(), getWidth());
         return div;
     }
 }

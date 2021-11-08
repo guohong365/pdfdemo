@@ -2,7 +2,6 @@ package com.nantian.pdf.weather.paper;
 
 import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.pdf.canvas.draw.SolidLine;
-import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.property.HorizontalAlignment;
@@ -12,7 +11,6 @@ import com.nantian.pdf.weather.config.IPapersConfig;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.net.MalformedURLException;
 import java.text.MessageFormat;
 import java.util.Map;
 
@@ -23,7 +21,7 @@ public class ImportantForecastService extends PaperGeneratorBase implements IImp
     }
 
     @Override
-    protected Div createBody(FontCollection fonts, Map<String, Object> params) {
+    protected Div createBody(Map<String, Object> params) {
         Div div=new Div();
         div.add(new Paragraph("重要天气预报")
                         .setFontColor(ColorConstants.RED)
@@ -93,7 +91,7 @@ public class ImportantForecastService extends PaperGeneratorBase implements IImp
     }
 
     @Override
-    protected Div createFooter(FontCollection fonts, Map<String, Object> params) {
+    protected Div createFooter(Map<String, Object> params) {
         Div div = new Div()
                 .setFont(fonts.fang)
                 .setFontSize(FONT_SIZE_4S_12)
@@ -148,8 +146,6 @@ public class ImportantForecastService extends PaperGeneratorBase implements IImp
                         .setTextAlignment(TextAlignment.RIGHT));
         table.addCell(cell);
         div.add(table);
-        logger.info("left: {} bottom: {} width: {}", getPageSetting().getLeftMargin(), getPageSetting().getBottomMargin(), getWidth());
-        div.setFixedPosition(getPageSetting().getLeftMargin(), getPageSetting().getBottomMargin(), getWidth());
         return div;
     }
 }
