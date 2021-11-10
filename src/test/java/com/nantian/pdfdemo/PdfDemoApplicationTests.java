@@ -27,6 +27,7 @@ import com.nantian.pdf.parse.IElementLocationListener;
 import com.nantian.pdf.parse.IPdfElementLocation;
 import com.nantian.pdf.utils.CellSlashRenderer;
 import com.nantian.pdf.utils.ChineseSymbolFactory;
+import com.nantian.pdf.utils.FontCollection;
 import com.nantian.pdf.utils.Units;
 import com.nantian.pdf.utils.locators.LocationInfo;
 import com.nantian.pdf.utils.locators.ParagraphLocator;

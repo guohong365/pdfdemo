@@ -1,6 +1,7 @@
-package com.nantian.pdf.weather.config;
+package com.nantian.pdf.config;
 
 import com.itextpdf.kernel.geom.PageSize;
+import com.nantian.pdf.utils.Font;
 
 public class PageSetting implements IPageSetting{
     PageSize pageSize;

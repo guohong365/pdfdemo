@@ -23,7 +23,7 @@ import com.nantian.pdf.utils.ChineseNumberConverter;
 import com.nantian.pdf.utils.ChineseSplitterCharacters;
 import com.nantian.pdf.utils.PageHeaderHandler;
 import com.nantian.pdf.utils.PageNumberHandler;
-import com.nantian.pdf.weather.paper.FontCollection;
+import com.nantian.pdf.utils.FontCollection;
 import com.nantian.pdf.weather.paper.IPaperGenerator;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -181,5 +181,11 @@ public class GenericTest {
                 .lineTo(x + width, y)
                 .stroke()
                 .restoreState();
+    }
+
+    @Test
+    void starTest(){
+        String STAR = "\u2605";
+        System.out.println(STAR);
     }
 }
