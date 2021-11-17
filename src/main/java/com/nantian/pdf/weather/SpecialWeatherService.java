@@ -8,6 +8,8 @@ import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.UnitValue;
+import com.nantian.pdf.config.IPapersConfig;
+import com.nantian.pdf.office.element.LineSeparatorEx;
 import com.nantian.pdf.utils.CellSlashRenderer;
 import org.springframework.stereotype.Component;
 

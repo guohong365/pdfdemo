@@ -7,6 +7,7 @@ import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.UnitValue;
+import com.nantian.pdf.office.element.LineSeparatorEx;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import com.nantian.pdf.config.IPapersConfig;
@@ -15,7 +16,7 @@ import java.util.Map;
 
 @Component
 public class ImportantForecastService extends PaperGeneratorBase implements IImportantForecastService {
-    protected ImportantForecastService(IPapersConfig config) {
+    public ImportantForecastService(IPapersConfig config) {
         super(config);
     }
 

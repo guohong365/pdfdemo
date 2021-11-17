@@ -6,7 +6,6 @@ import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfPage;
-import com.itextpdf.kernel.pdf.PdfReader;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.layout.Document;
@@ -21,20 +20,16 @@ import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.UnitValue;
 import com.itextpdf.layout.renderer.IRenderer;
 import com.nantian.pdf.config.IPageSetting;
+import com.nantian.pdf.config.IPapersConfig;
 import com.nantian.pdf.utils.ChineseSplitterCharacters;
 import com.nantian.pdf.utils.FontCollection;
-import com.nantian.pdf.utils.locators.LocationInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +37,6 @@ import java.util.Map;
 public abstract class PaperGeneratorBase implements IPaperGenerator {
     protected final IPapersConfig config;
     protected final IPageSetting pageSetting;
-    protected Logger logger= LoggerFactory.getLogger(getClass());
     protected final FontCollection fonts;
     protected PaperGeneratorBase(IPapersConfig config) {
         this.config = config;
@@ -85,13 +79,9 @@ public abstract class PaperGeneratorBase implements IPaperGenerator {
                 - getPageSetting().getRightMargin();
     }
 
-    protected Document createDocument(Map<String, Object> params, InputStream input, OutputStream output) throws IOException {
+    protected Document createDocument(Map<String, Object> params, OutputStream output) {
         PdfDocument pdfDocument;
-        if (input != null) {
-            pdfDocument = new PdfDocument(new PdfReader(input), new PdfWriter(output));
-        } else {
-            pdfDocument = new PdfDocument(new PdfWriter(output));
-        }
+        pdfDocument = new PdfDocument(new PdfWriter(output));
         onPdfDocumentCreated(pdfDocument, params);
         Document document = new Document(pdfDocument, PageSize.A4);
         document.setTextAlignment(TextAlignment.JUSTIFIED);
@@ -109,8 +99,7 @@ public abstract class PaperGeneratorBase implements IPaperGenerator {
 
     public void generate(Map<String, Object> params, String output) throws Exception {
         OutputStream bodyOutput = new FileOutputStream(output);
-        Document document = createDocument(params, null, bodyOutput);
-        List<LocationInfo> bodyLocations = new ArrayList<>();
+        Document document = createDocument(params, bodyOutput);
         Div div = createBody(params);
         document.add(div);
         Rectangle effectiveArea = document.getPageEffectiveArea(PageSize.A4);

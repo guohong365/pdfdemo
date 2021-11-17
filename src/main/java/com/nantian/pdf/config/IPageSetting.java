@@ -1,4 +1,4 @@
-package com.nantian.pdf;
+package com.nantian.pdf.config;
 
 import com.itextpdf.kernel.geom.PageSize;
 import com.nantian.pdf.utils.Font;

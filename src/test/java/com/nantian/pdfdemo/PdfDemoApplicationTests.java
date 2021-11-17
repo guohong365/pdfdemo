@@ -32,7 +32,10 @@ import com.nantian.pdf.utils.Units;
 import com.nantian.pdf.utils.locators.LocationInfo;
 import com.nantian.pdf.utils.locators.ParagraphLocator;
 import com.nantian.pdf.utils.locators.TableLocator;
-import com.nantian.pdf.weather.paper.*;
+import com.nantian.pdf.weather.IImportantForecastService;
+import com.nantian.pdf.weather.ISpecialWeatherService;
+import com.nantian.pdf.weather.IWeeklyReport;
+import com.nantian.pdf.office.element.LineSeparatorEx;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -289,7 +292,7 @@ class PdfDemoApplicationTests {
         specialWeatherService.generate(params, RESULT_DIR + "4.pdf");
     }
 
-    //@Test
+    @Test
     void contextLoads() throws IOException {
         try {
             FontCollection fonts = createFonts();
@@ -395,7 +398,7 @@ class PdfDemoApplicationTests {
             document2.add(createDiv(createFonts()));
             document2.close();
             //byte[] twoPart = second_output.toByteArray();
-            in = new FileInputStream("1-2.pdf");
+            in = new FileInputStream(RESULT_DIR + "1-2.pdf");
             PdfDocument pdfDocument4 = new PdfDocument(new PdfReader(in));
             IElementLocationListener secondStrategy = new ElementLocationListener();
             parser = new PdfDocumentContentParser(pdfDocument4);
