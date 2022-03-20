@@ -1,7 +1,6 @@
 package com.nantian.pdf.office;
 
 import com.itextpdf.layout.element.Div;
-import com.itextpdf.layout.element.IBlockElement;
 import com.itextpdf.layout.element.Paragraph;
 import com.nantian.pdf.FontSizes;
 import com.nantian.pdf.utils.Font;
