@@ -36,4 +36,12 @@ papers:
       default-font:
         name: "fang"
         size: 16
+    officeDocument:
+      top-margin: 104.88
+      bottom-margin: 99.32
+      left-margin: 79.37
+      right-margin: 73.43
+      default-font:
+        name: "fang"
+        size: 16
 
