@@ -16,20 +16,11 @@ import java.util.*;
 @ConfigurationProperties(prefix = "papers")
 public class PapersConfig implements IPapersConfig{
     String fontPath;
-    String resourcesPath;
     List<Font> fonts;
     Map<String, PageSetting> settings=new HashMap<>();
     @Override
     public Map<String, PageSetting> getSettings() {
         return settings;
-    }
-
-    public String getResourcesPath() {
-        return resourcesPath;
-    }
-
-    public void setResourcesPath(String resourcesPath) {
-        this.resourcesPath = resourcesPath;
     }
 
     public String getFontPath() {
@@ -74,7 +65,6 @@ public class PapersConfig implements IPapersConfig{
     public String toString() {
         return "PapersConfig{" +
                 "fontPath='" + fontPath + '\'' +
-                ", templatesPath='" + resourcesPath + '\'' +
                 ", fonts=" + fonts +
                 ", settings=" + settings +
                 '}';

@@ -129,24 +129,6 @@ public class SpecialWeatherService extends PaperGeneratorBase implements ISpecia
                 .setMarginBottom(FONT_SIZE_40_14)
                 .setMarginTop(FONT_SIZE_40_14);
         Cell cell=new Cell(2,1);
-        try {
-            Image image =new Image(ImageDataFactory.create(config.getResourcesPath() + File.separator + "slash.png"));
-            BackgroundImage backgroundImage=
-                    new BackgroundImage.Builder()
-                            .setImage(image.getXObject())
-                            .setBackgroundRepeat(new BackgroundRepeat(BackgroundRepeat.BackgroundRepeatValue.ROUND)).build();
-            cell.setBackgroundImage(backgroundImage)
-                    .add(new Paragraph("城市")
-                            .setTextAlignment(TextAlignment.RIGHT)
-                            .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                            .setMargins(0, 2, 0, 0))
-                    .add(new Paragraph("日期")
-                            .setTextAlignment(TextAlignment.CENTER)
-                            .setVerticalAlignment(VerticalAlignment.BOTTOM)
-                            .setMargins(0, 0,2,0));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
         table.addCell(cell);
         cell = new Cell(1,2).add(new Paragraph("香格里拉"));
         table.addCell(cell);

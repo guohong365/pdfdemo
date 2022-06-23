@@ -1,6 +1,5 @@
 papers:
   font-path: "src/main/resources/fonts"
-  resources-path: "src/main/resources/images"
   fonts:
     - name: "hei"
       file: "simhei.ttf"
