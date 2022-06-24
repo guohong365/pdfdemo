@@ -2,7 +2,7 @@ package com.nantian.pdf.office;
 
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.*;
-import com.itextpdf.layout.property.ListNumberingType;
+import com.itextpdf.layout.properties.ListNumberingType;
 import com.nantian.pdf.FontSizes;
 import com.nantian.pdf.utils.Font;
 

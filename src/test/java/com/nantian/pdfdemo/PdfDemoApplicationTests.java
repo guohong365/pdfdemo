@@ -19,7 +19,7 @@ import com.itextpdf.layout.Document;
 import com.itextpdf.layout.Style;
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.*;
-import com.itextpdf.layout.property.*;
+import com.itextpdf.layout.properties.*;
 import com.itextpdf.layout.renderer.CellRenderer;
 import com.itextpdf.layout.renderer.DrawContext;
 import com.nantian.pdf.parse.ElementLocationListener;
@@ -46,7 +46,7 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.*;
 
-import static com.itextpdf.layout.property.BackgroundRepeat.BackgroundRepeatValue;
+import static com.itextpdf.layout.properties.BackgroundRepeat.BackgroundRepeatValue;
 
 @SpringBootTest
 class PdfDemoApplicationTests {

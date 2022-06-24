@@ -2,7 +2,7 @@ package com.nantian.pdf.office;
 
 import com.itextpdf.layout.element.Div;
 import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.property.TextAlignment;
+import com.itextpdf.layout.properties.TextAlignment;
 import com.nantian.pdf.FontSizes;
 import com.nantian.pdf.utils.Font;
 import org.springframework.util.StringUtils;

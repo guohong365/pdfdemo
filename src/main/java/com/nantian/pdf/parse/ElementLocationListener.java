@@ -20,6 +20,7 @@ public class ElementLocationListener implements IElementLocationListener {
         result.sort((l1, l2) -> {
             Rectangle o1 = l1.getRectangle();
             Rectangle o2 = l2.getRectangle();
+
             if (o1.getY() == o2.getY()) {
                 return Float.compare(o1.getX(), o2.getX());
             } else {
@@ -45,6 +46,10 @@ public class ElementLocationListener implements IElementLocationListener {
 
     @Override
     public void eventOccurred(IEventData data, EventType type) {
+        if(type==EventType.BEGIN_TEXT || type==EventType.END_TEXT || type==EventType.CLIP_PATH_CHANGED)
+        {
+            return;
+        }
         Rectangle bounds =null;
         if(data instanceof TextRenderInfo){
             TextRenderInfo info=(TextRenderInfo) data;
@@ -64,12 +69,14 @@ public class ElementLocationListener implements IElementLocationListener {
                     }
                 }
             }
-            result.add(new ElementLocation(0, bounds, info.getPath()));
+            if(bounds!=null){
+                result.add(new ElementLocation(0, bounds, info.getPath()));
+            }
         } else if(data instanceof ImageRenderInfo){
 
             ImageRenderInfo info = (ImageRenderInfo) data;
             Matrix matrix= info.getImageCtm();
-            System.out.println(matrix);
+            //System.out.println(matrix);
             result.add(new ElementLocation(0, new Rectangle(
                     info.getStartPoint().get(0),
                     info.getStartPoint().get(1),

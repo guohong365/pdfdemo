@@ -5,7 +5,7 @@ import com.itextpdf.layout.IPropertyContainer;
 import com.itextpdf.layout.Style;
 import com.itextpdf.layout.element.IElement;
 import com.itextpdf.layout.element.Text;
-import com.itextpdf.layout.property.IListSymbolFactory;
+import com.itextpdf.layout.properties.IListSymbolFactory;
 import org.springframework.util.StringUtils;
 
 public class ChineseSymbolFactory implements IListSymbolFactory {

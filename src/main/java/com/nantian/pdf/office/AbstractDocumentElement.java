@@ -2,7 +2,6 @@ package com.nantian.pdf.office;
 
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.geom.Rectangle;
-import com.itextpdf.layout.Style;
 import com.itextpdf.layout.element.Div;
 import com.itextpdf.layout.element.IBlockElement;
 import com.itextpdf.layout.element.IElement;
@@ -10,7 +9,7 @@ import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.layout.LayoutArea;
 import com.itextpdf.layout.layout.LayoutContext;
 import com.itextpdf.layout.layout.LayoutResult;
-import com.itextpdf.layout.property.Property;
+import com.itextpdf.layout.properties.Property;
 import com.itextpdf.layout.renderer.IRenderer;
 import com.nantian.pdf.utils.ChineseSplitterCharacters;
 

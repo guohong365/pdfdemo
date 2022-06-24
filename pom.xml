@@ -41,45 +41,67 @@
         <dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>kernel</artifactId>
-            <version>7.1.17</version>
+            <version>7.2.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>commons</artifactId>
+            <version>7.2.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>layout</artifactId>
-            <version>7.1.17</version>
+            <version>7.2.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>io</artifactId>
-            <version>7.1.17</version>
+            <version>7.2.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>font-asian</artifactId>
-            <version>7.1.17</version>
+            <version>7.2.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>svg</artifactId>
-            <version>7.1.17</version>
+            <version>7.2.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>hyph</artifactId>
-            <version>7.1.17</version>
+            <version>7.2.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>forms</artifactId>
-            <version>7.1.17</version>
+            <version>7.2.1-SNAPSHOT</version>
         </dependency>
+
         <dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>pdfa</artifactId>
-            <version>7.1.17</version>
+            <version>7.2.1-SNAPSHOT</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.11</version>
+        </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>cleanup</artifactId>
+            <version>3.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.68</version>
+            <scope>runtime</scope>
+        </dependency>
 
     </dependencies>
 

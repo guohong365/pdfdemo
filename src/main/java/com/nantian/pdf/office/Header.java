@@ -6,8 +6,8 @@ import com.itextpdf.kernel.pdf.canvas.draw.SolidLine;
 import com.itextpdf.layout.element.Div;
 import com.itextpdf.layout.element.IBlockElement;
 import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.property.Property;
-import com.itextpdf.layout.property.UnitValue;
+import com.itextpdf.layout.properties.Property;
+import com.itextpdf.layout.properties.UnitValue;
 import com.nantian.pdf.office.element.LineSeparatorEx;
 import com.nantian.pdf.utils.Units;
 
